@@ -36,6 +36,9 @@ public class Prodotto {
     @Column(name = "QUANTITA_DISPONIBILE", nullable = false)
     private Integer quantitaDisponibile;
 
+    @Column(name = "IMMAGINE_URL")
+    private String imageUrl;
+
     // Relazione molti-a-uno: molti prodotti possono appartenere a una categoria.
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ID_CATEGORIA", nullable = false)

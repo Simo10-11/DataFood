@@ -7,6 +7,7 @@ export interface Prodotto {
   // Prezzo unitario in euro.
   prezzo: number;
   quantitaDisponibile: number;
+  imageUrl: string | null;
   // Categoria in formato "piatto" per semplificare il consumo lato UI.
   idCategoria: number;
   nomeCategoria?: string;

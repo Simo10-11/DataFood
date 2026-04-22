@@ -1,5 +1,9 @@
 <article class="product-card">
-  <div class="placeholder-image">IMG</div>
+  @if (prodotto.imageUrl && prodotto.imageUrl.trim() !== '') {
+    <img class="product-image" [src]="prodotto.imageUrl" [alt]="prodotto.nome" />
+  } @else {
+    <div class="product-image-fallback" aria-label="Foto in arrivo">Foto in arrivo</div>
+  }
 
   <h4>{{ prodotto.nome }}</h4>
   <p class="description">{{ prodotto.descrizione || 'Prodotto alimentare disponibile nel catalogo.' }}</p>

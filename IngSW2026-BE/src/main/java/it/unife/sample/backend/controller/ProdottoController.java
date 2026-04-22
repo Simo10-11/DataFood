@@ -2,6 +2,7 @@ package it.unife.sample.backend.controller;
 
 import it.unife.sample.backend.dto.ProdottoDTO;
 import it.unife.sample.backend.service.ProdottoService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,20 +22,20 @@ public class ProdottoController {
     }
 
     @GetMapping
-    public List<ProdottoDTO> getAllProducts() {
+    public ResponseEntity<List<ProdottoDTO>> getAllProducts() {
         // Restituisce il catalogo completo prodotti.
-        return prodottoService.findAll();
+        return ResponseEntity.ok(prodottoService.findAll());
     }
 
     @GetMapping("/search")
-    public List<ProdottoDTO> searchProducts(@RequestParam(defaultValue = "") String nome) {
+    public ResponseEntity<List<ProdottoDTO>> searchProducts(@RequestParam(defaultValue = "") String nome) {
         // Ricerca prodotti per nome: /products/search?nome=...
-        return prodottoService.searchByNome(nome);
+        return ResponseEntity.ok(prodottoService.searchByNome(nome));
     }
 
     @GetMapping("/categoria/{id}")
-    public List<ProdottoDTO> getByCategoria(@PathVariable Integer id) {
+    public ResponseEntity<List<ProdottoDTO>> getByCategoria(@PathVariable Integer id) {
         // Filtra prodotti per categoria: /products/categoria/{id}
-        return prodottoService.findByCategoriaId(id);
+        return ResponseEntity.ok(prodottoService.findByCategoriaId(id));
     }
 }

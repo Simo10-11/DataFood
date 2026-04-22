@@ -9,13 +9,22 @@
   box-shadow: 0 6px 20px rgba(80, 40, 20, 0.08);
 }
 
-.placeholder-image {
+.product-image {
   border-radius: 12px;
   height: 120px;
+  width: 100%;
+  object-fit: cover;
+  background: linear-gradient(140deg, #ffe9d6, #f9c8aa);
+}
+
+.product-image-fallback {
+  border-radius: 12px;
+  height: 120px;
+  width: 100%;
   display: flex;
-  justify-content: center;
   align-items: center;
-  font-weight: 700;
+  justify-content: center;
+  font-weight: 600;
   color: #8c3f2c;
   background: linear-gradient(140deg, #ffe9d6, #f9c8aa);
 }

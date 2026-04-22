@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { Prodotto } from '../dto/prodotto.model';
 
 @Injectable({
@@ -17,13 +17,17 @@ export class ProductService {
     return this.http.get<Prodotto[]>(this.apiUrl);
   }
 
-  searchByNome(nome: string): Observable<Prodotto[]> {
+  searchByNome(nome: string | undefined): Observable<Prodotto[]> {
+    const safeNome = nome ?? '';
     // GET ricerca per nome con query param ?nome=...
-    const params = new HttpParams().set('nome', nome);
+    const params = new HttpParams().set('nome', safeNome);
     return this.http.get<Prodotto[]>(`${this.apiUrl}/search`, { params });
   }
 
-  getByCategoria(id: number): Observable<Prodotto[]> {
+  getByCategoria(id: number | undefined): Observable<Prodotto[]> {
+    if (id === undefined) {
+      return of([]);
+    }
     // GET prodotti filtrati per categoria.
     return this.http.get<Prodotto[]>(`${this.apiUrl}/categoria/${id}`);
   }
