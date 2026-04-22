@@ -11,15 +11,17 @@ import java.util.List;
 public class CategoriaService {
 
     private final CategoriaRepository categoriaRepository;
+    private final CategoriaMapper categoriaMapper;
 
-    public CategoriaService(CategoriaRepository categoriaRepository) {
+    public CategoriaService(CategoriaRepository categoriaRepository, CategoriaMapper categoriaMapper) {
         this.categoriaRepository = categoriaRepository;
+        this.categoriaMapper = categoriaMapper;
     }
 
     public List<CategoriaDTO> findAll() {
         // Recupera tutte le categorie e le converte in DTO.
         return categoriaRepository.findAll().stream()
-                .map(CategoriaMapper::toDTO)
+                .map(categoriaMapper::toDTO)
                 .toList();
     }
 }
