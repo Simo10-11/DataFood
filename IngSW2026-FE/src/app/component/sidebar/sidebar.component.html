@@ -1,5 +1,8 @@
 <aside class="sidebar">
-  <h3>Categorie</h3>
+  <div class="sidebar-title-wrap">
+    <h3>Categorie</h3>
+    <span class="sidebar-separator" aria-hidden="true"></span>
+  </div>
 
   <button
     type="button"
@@ -7,7 +10,8 @@
     [class.active]="categoriaSelezionataId === undefined"
     (click)="resetFiltro()"
   >
-    Tutte
+    <span class="category-emoji" aria-hidden="true">🧺</span>
+    <span>Tutte</span>
   </button>
 
   <button
@@ -17,6 +21,7 @@
     [class.active]="(categoria.id ?? categoria.ID) === categoriaSelezionataId"
     (click)="selectCategoria(categoria)"
   >
-    {{ categoria.nome }}
+    <span class="category-emoji" aria-hidden="true">🥬</span>
+    <span>{{ categoria.nome }}</span>
   </button>
 </aside>

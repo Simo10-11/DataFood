@@ -1,4 +1,28 @@
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+:root {
+	--color-primary: #2e7d32;
+	--color-primary-dark: #1b5e20;
+	--color-primary-light: #e8f5e9;
+	--color-accent: #f57c00;
+	--color-text: #212121;
+	--color-text-muted: #757575;
+	--color-bg: #f9f9f9;
+	--color-card: #ffffff;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body {
+	height: 100%;
+}
+
+body {
+	margin: 0;
+	font-family: "Segoe UI", "Nunito Sans", sans-serif;
+	color: var(--color-text);
+	background: var(--color-bg);
+}

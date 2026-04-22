@@ -1,14 +1,34 @@
 <article class="product-card">
-  @if (prodotto.imageUrl && prodotto.imageUrl.trim() !== '') {
-    <img class="product-image" [src]="prodotto.imageUrl" [alt]="prodotto.nome" />
-  } @else {
-    <div class="product-image-fallback" aria-label="Foto in arrivo">Foto in arrivo</div>
-  }
+  <button
+    type="button"
+    class="wishlist-button"
+    [class.active]="wishlistSelected"
+    (click)="toggleWishlist()"
+    aria-label="Aggiungi alla wishlist"
+  >
+    ❤
+  </button>
 
-  <h4>{{ prodotto.nome }}</h4>
+  <div class="image-shell">
+    @if (prodotto.imageUrl && prodotto.imageUrl.trim() !== '') {
+      <img class="product-image" [src]="prodotto.imageUrl" [alt]="prodotto.nome" />
+    } @else {
+      <div class="product-image-fallback" aria-label="Foto in arrivo">Foto in arrivo</div>
+    }
+  </div>
+
+  <h4 [title]="prodotto.nome">{{ prodotto.nome }}</h4>
   <p class="description">{{ prodotto.descrizione || 'Prodotto alimentare disponibile nel catalogo.' }}</p>
 
   <p class="price">{{ prodotto.prezzo | number:'1.2-2' }} EUR</p>
 
-  <button type="button" class="cart-button">Aggiungi al carrello</button>
+  <div class="quantity-row" aria-label="Controllo quantita">
+    <button type="button" class="qty-button" (click)="decrementQuantity()" aria-label="Riduci quantita">-</button>
+    <span class="qty-value">{{ quantity }}</span>
+    <button type="button" class="qty-button" (click)="incrementQuantity()" aria-label="Aumenta quantita">+</button>
+  </div>
+
+  <button type="button" class="cart-button" [disabled]="quantity === 0" (click)="addToCart()">
+    Aggiungi al carrello
+  </button>
 </article>

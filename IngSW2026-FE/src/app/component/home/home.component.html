@@ -2,14 +2,19 @@
   <app-navbar (searchChange)="onSearchChange($event)"></app-navbar>
 
   <main class="home-layout">
-    <app-sidebar
-      [categorie]="categorie"
-      [categoriaSelezionataId]="categoriaSelezionataId"
-      (categoriaSelected)="filterByCategoria($event)"
-    ></app-sidebar>
+    <section class="sidebar-area">
+      <app-sidebar
+        [categorie]="categorie"
+        [categoriaSelezionataId]="categoriaSelezionataId"
+        (categoriaSelected)="filterByCategoria($event)"
+      ></app-sidebar>
+    </section>
 
     <section class="products-area">
-      <h2>Catalogo prodotti</h2>
+      <header class="products-header">
+        <h2>{{ titoloCatalogo }}</h2>
+        <p>{{ prodotti.length }} prodotti trovati</p>
+      </header>
 
       <div class="products-grid" *ngIf="prodotti.length > 0; else noProducts">
         <app-product-card
@@ -19,7 +24,11 @@
       </div>
 
       <ng-template #noProducts>
-        <p class="empty-state">Nessun prodotto trovato con i filtri selezionati.</p>
+        <div class="empty-state" role="status" aria-live="polite">
+          <div class="empty-state-icon" aria-hidden="true">🛒</div>
+          <p class="empty-state-title">Nessun prodotto trovato</p>
+          <p class="empty-state-subtitle">Prova a cercare qualcos'altro</p>
+        </div>
       </ng-template>
     </section>
   </main>

@@ -92,4 +92,16 @@ export class HomeComponent implements OnInit {
       this.prodotti = filteredBySearch;
     });
   }
+
+  get titoloCatalogo(): string {
+    if (this.categoriaSelezionataId === undefined) {
+      return 'Tutti i prodotti';
+    }
+
+    const categoria = this.categorie.find(
+      (item) => (item.id ?? item.ID) === this.categoriaSelezionataId
+    );
+
+    return categoria?.nome ?? 'Categoria selezionata';
+  }
 }
