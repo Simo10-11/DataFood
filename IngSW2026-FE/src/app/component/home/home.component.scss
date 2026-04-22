@@ -1,0 +1,43 @@
+.home-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 12% 16%, rgba(242, 164, 114, 0.22), transparent 34%),
+    radial-gradient(circle at 87% 82%, rgba(201, 105, 72, 0.18), transparent 36%),
+    #fff8f2;
+}
+
+.home-layout {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.products-area {
+  background: #fffefc;
+  border: 1px solid #f0d7c8;
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.products-area h2 {
+  margin-top: 0;
+  color: #4a2f26;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.empty-state {
+  margin: 1.2rem 0;
+  color: #7b6258;
+}
+
+@media (max-width: 900px) {
+  .home-layout {
+    grid-template-columns: 1fr;
+  }
+}

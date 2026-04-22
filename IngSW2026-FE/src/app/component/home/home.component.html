@@ -1,0 +1,26 @@
+<div class="home-page">
+  <app-navbar (searchChange)="onSearchChange($event)"></app-navbar>
+
+  <main class="home-layout">
+    <app-sidebar
+      [categorie]="categorie"
+      [categoriaSelezionataId]="categoriaSelezionataId"
+      (categoriaSelected)="filterByCategoria($event)"
+    ></app-sidebar>
+
+    <section class="products-area">
+      <h2>Catalogo prodotti</h2>
+
+      <div class="products-grid" *ngIf="prodotti.length > 0; else noProducts">
+        <app-product-card
+          *ngFor="let prodotto of prodotti"
+          [prodotto]="prodotto"
+        ></app-product-card>
+      </div>
+
+      <ng-template #noProducts>
+        <p class="empty-state">Nessun prodotto trovato con i filtri selezionati.</p>
+      </ng-template>
+    </section>
+  </main>
+</div>

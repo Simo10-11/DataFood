@@ -1,0 +1,10 @@
+<article class="product-card">
+  <div class="placeholder-image">IMG</div>
+
+  <h4>{{ prodotto.nome }}</h4>
+  <p class="description">{{ prodotto.descrizione || 'Prodotto alimentare disponibile nel catalogo.' }}</p>
+
+  <p class="price">{{ prodotto.prezzo | number:'1.2-2' }} EUR</p>
+
+  <button type="button" class="cart-button">Aggiungi al carrello</button>
+</article>

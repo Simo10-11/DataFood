@@ -1,0 +1,28 @@
+.sidebar {
+  background: #fff;
+  border: 1px solid #f0d7c8;
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 6px 20px rgba(80, 40, 20, 0.06);
+}
+
+.sidebar h3 {
+  margin-top: 0;
+  color: #51332a;
+}
+
+.category-button {
+  width: 100%;
+  text-align: left;
+  margin-bottom: 0.55rem;
+  border: 1px solid #f0d7c8;
+  border-radius: 10px;
+  background: #fffaf5;
+  padding: 0.55rem 0.7rem;
+  cursor: pointer;
+}
+
+.category-button.active {
+  border-color: #a84f3a;
+  background: #fde7db;
+}

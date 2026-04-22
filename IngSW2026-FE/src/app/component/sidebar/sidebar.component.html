@@ -1,0 +1,22 @@
+<aside class="sidebar">
+  <h3>Categorie</h3>
+
+  <button
+    type="button"
+    class="category-button"
+    [class.active]="categoriaSelezionataId === undefined"
+    (click)="resetFiltro()"
+  >
+    Tutte
+  </button>
+
+  <button
+    *ngFor="let categoria of categorie"
+    type="button"
+    class="category-button"
+    [class.active]="(categoria.id ?? categoria.ID) === categoriaSelezionataId"
+    (click)="selectCategoria(categoria)"
+  >
+    {{ categoria.nome }}
+  </button>
+</aside>

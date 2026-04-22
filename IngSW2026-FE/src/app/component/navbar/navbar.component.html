@@ -1,0 +1,15 @@
+<header class="navbar">
+  <div class="logo">DataFood</div>
+
+  <input
+    type="text"
+    class="search"
+    placeholder="Cerca prodotti..."
+    [(ngModel)]="searchText"
+    (input)="onSearchInput()"
+  />
+
+  <button class="user-button" type="button" aria-label="Profilo utente">
+    U
+  </button>
+</header>
