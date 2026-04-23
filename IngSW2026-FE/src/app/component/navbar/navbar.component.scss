@@ -57,21 +57,91 @@
   box-shadow: 0 0 0 2px rgba(245, 124, 0, 0.35);
 }
 
-.user-button {
-  width: 40px;
-  height: 40px;
-  border: none;
-  border-radius: 50%;
-  background: #ffffff;
-  color: var(--color-primary-dark);
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
 }
 
-.user-button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+.login-button {
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 20px;
+  background: transparent;
+  color: #ffffff;
+  font-weight: 700;
+  padding: 0 0.9rem;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+}
+
+.login-button:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.user-greeting {
+  min-height: 38px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0.95rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.logout-button {
+  height: 38px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  font-weight: 700;
+  padding: 0 0.95rem;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.logout-confirmation {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 38px;
+  padding: 0 0.85rem;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.logout-confirmation-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.logout-cancel-button,
+.logout-confirm-button {
+  height: 30px;
+  border-radius: 16px;
+  border: none;
+  padding: 0 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.logout-cancel-button {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+.logout-confirm-button {
+  background: #ffffff;
+  color: var(--color-primary-dark);
 }
 
 @media (max-width: 768px) {
@@ -83,6 +153,12 @@
     min-height: auto;
     grid-template-columns: 1fr auto;
     row-gap: 0.55rem;
+  }
+
+  .actions {
+    justify-self: end;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 
   .search-wrap {

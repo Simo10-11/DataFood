@@ -18,8 +18,30 @@
       />
     </div>
 
-    <button class="user-button" type="button" aria-label="Profilo utente">
-      <span>U</span>
-    </button>
+    <div class="actions">
+      <button *ngIf="!currentUser" class="login-button" type="button" routerLink="/login">LOGIN</button>
+      <ng-container *ngIf="currentUser as user">
+        <div class="user-greeting" aria-label="Utente loggato">
+          Ciao {{ user.nome }}
+        </div>
+
+        <button
+          *ngIf="!logoutConfirmationVisible"
+          class="logout-button"
+          type="button"
+          (click)="requestLogout()"
+        >
+          Logout
+        </button>
+
+        <div *ngIf="logoutConfirmationVisible" class="logout-confirmation" role="status" aria-live="polite">
+          <span>Confermi il logout?</span>
+          <div class="logout-confirmation-actions">
+            <button class="logout-cancel-button" type="button" (click)="cancelLogout()">Annulla</button>
+            <button class="logout-confirm-button" type="button" (click)="confirmLogout()">Esci</button>
+          </div>
+        </div>
+      </ng-container>
+    </div>
   </div>
 </header>
