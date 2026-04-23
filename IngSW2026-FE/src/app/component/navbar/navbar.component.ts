@@ -16,6 +16,7 @@ export class NavbarComponent {
   @Output() searchChange = new EventEmitter<string>();
 
   searchText = '';
+  // Flag UI locale: quando true mostriamo i pulsanti di conferma logout.
   logoutConfirmationVisible = false;
 
   constructor(
@@ -24,6 +25,7 @@ export class NavbarComponent {
   ) {}
 
   get currentUser() {
+    // Lo leggiamo dal service cosi tutta la logica di persistenza resta centralizzata.
     return this.authService.getCurrentUser();
   }
 
@@ -32,14 +34,17 @@ export class NavbarComponent {
   }
 
   requestLogout(): void {
+    // Primo click su logout: non usciamo subito, chiediamo conferma.
     this.logoutConfirmationVisible = true;
   }
 
   cancelLogout(): void {
+    // Se annulla, torniamo alla navbar compatta senza perdere utente.
     this.logoutConfirmationVisible = false;
   }
 
   confirmLogout(): void {
+    // Logout confermato: pulizia stato locale e redirect al catalogo.
     this.authService.logout();
     this.logoutConfirmationVisible = false;
     this.router.navigateByUrl('/');

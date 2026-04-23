@@ -19,13 +19,17 @@ public class UtenteService {
 	}
 
 	public UtenteDTO login(LoginRequestDTO request) {
+		// Primo step: cerchiamo per email, cosi gestiamo il caso "utente inesistente" subito.
 		Utente utente = utenteRepository.findByEmail(request.getEmail())
 				.orElseThrow(() -> new IllegalArgumentException("Utente non trovato"));
 
+		// Password in chiaro solo per il progetto didattico.
+		// In una versione reale qui andrebbe hash + confronto sicuro.
 		if (!utente.getPassword().equals(request.getPassword())) {
 			throw new IllegalArgumentException("Password errata");
 		}
 
+		// Torniamo un DTO per non esporre campi sensibili (es. password).
 		return utenteMapper.toDTO(utente);
 	}
 }
