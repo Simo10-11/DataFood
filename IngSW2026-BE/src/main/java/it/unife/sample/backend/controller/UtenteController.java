@@ -1,6 +1,7 @@
 package it.unife.sample.backend.controller;
 
 import it.unife.sample.backend.dto.LoginRequestDTO;
+import it.unife.sample.backend.dto.RegisterRequestDTO;
 import it.unife.sample.backend.dto.UtenteDTO;
 import it.unife.sample.backend.service.UtenteService;
 import org.springframework.http.HttpStatus;
@@ -27,6 +28,16 @@ public class UtenteController {
 			// Se email/password non tornano rispondiamo 401.
 			// Evitiamo di dare dettagli per non esporre troppo lato utente.
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+	}
+
+	@PostMapping("/auth/register")
+	public ResponseEntity<UtenteDTO> register(@RequestBody RegisterRequestDTO request) {
+		try {
+			return ResponseEntity.status(HttpStatus.CREATED).body(utenteService.register(request));
+		} catch (IllegalArgumentException exception) {
+			// Email gia presente: restituiamo errore client senza esporre dettagli sensibili.
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 		}
 	}
 }

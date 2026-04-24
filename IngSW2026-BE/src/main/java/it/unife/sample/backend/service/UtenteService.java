@@ -1,6 +1,7 @@
 package it.unife.sample.backend.service;
 
 import it.unife.sample.backend.dto.LoginRequestDTO;
+import it.unife.sample.backend.dto.RegisterRequestDTO;
 import it.unife.sample.backend.dto.UtenteDTO;
 import it.unife.sample.backend.mapper.UtenteMapper;
 import it.unife.sample.backend.model.Utente;
@@ -31,6 +32,31 @@ public class UtenteService {
 
 		// Torniamo un DTO per non esporre campi sensibili (es. password).
 		return utenteMapper.toDTO(utente);
+	}
+
+	public UtenteDTO register(RegisterRequestDTO request) {
+		// Evitiamo duplicati: l'email deve essere univoca.
+		if (utenteRepository.findByEmail(request.getEmail()).isPresent()) {
+			throw new IllegalArgumentException("Email gia registrata");
+		}
+
+		// Password in chiaro solo per esercitazione universitaria.
+		Utente nuovoUtente = new Utente(
+				null,
+				request.getNome(),
+				request.getCognome(),
+				null,
+				"cliente",
+				request.getEmail(),
+				request.getPassword(),
+				null,
+				null,
+				null,
+				null
+		);
+
+		Utente salvato = utenteRepository.save(nuovoUtente);
+		return utenteMapper.toDTO(salvato);
 	}
 }
 

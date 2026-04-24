@@ -10,7 +10,6 @@ public interface UtenteMapper {
 
 	UtenteDTO toDTO(Utente entity);
 
-	@Mapping(target = "cognome", ignore = true)
 	@Mapping(target = "numeroTelefono", ignore = true)
 	@Mapping(target = "ruolo", ignore = true)
 	@Mapping(target = "password", ignore = true)
