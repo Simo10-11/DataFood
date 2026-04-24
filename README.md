@@ -23,26 +23,6 @@ Applicazione backend per la gestione e visualizzazione di prodotti alimentari (e
 
 ---
 
-## ⚙️ Installazione
-
-1. Clona il repository:
-
-```bash
-git clone https://github.com/Simo10-11/DataFood.git
-```
-
-2. Vai nella cartella del progetto:
-
-```bash
-cd DataFood
-```
-
-3. Installa le dipendenze:
-
-```bash
-npm install
-```
-
 ## 👤 Autore
 
 * Elisabetta
