@@ -2,8 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { CartService } from '../../service/cart.service';
+import { OrderService } from '../../service/order.service';
 import { Cart } from '../../dto/cart.model';
 import { CartItem } from '../../dto/cart-item.model';
+import { Order } from '../../dto/order.model';
 
 @Component({
   selector: 'app-cart',
@@ -16,8 +18,13 @@ export class CartComponent implements OnInit {
   cart: Cart = { items: [], totale: 0 };
   loading = false;
   errorMessage = '';
+  checkoutMessage = '';
+  createdOrder: Order | null = null;
 
-  constructor(private cartService: CartService) {}
+  constructor(
+    private cartService: CartService,
+    private orderService: OrderService
+  ) {}
 
   ngOnInit(): void {
     this.loadCart();
@@ -26,6 +33,7 @@ export class CartComponent implements OnInit {
   loadCart(): void {
     this.loading = true;
     this.errorMessage = '';
+    this.checkoutMessage = '';
 
     this.cartService.getCart().subscribe({
       next: (cart) => {
@@ -35,6 +43,42 @@ export class CartComponent implements OnInit {
       error: () => {
         this.loading = false;
         this.errorMessage = 'Impossibile caricare il carrello.';
+      }
+    });
+  }
+
+  checkout(): void {
+    if (!this.cart.items || this.cart.items.length === 0) {
+      this.errorMessage = 'Carrello vuoto: aggiungi almeno un prodotto prima del checkout.';
+      return;
+    }
+
+    this.errorMessage = '';
+    this.checkoutMessage = '';
+
+    this.orderService.checkout().subscribe({
+      next: (order) => {
+        this.createdOrder = order;
+        this.checkoutMessage = 'Ordine confermato e messo in lavorazione.';
+        this.cart = { items: [], totale: 0 };
+      },
+      error: (errorResponse) => {
+        if (errorResponse?.status === 401) {
+          this.errorMessage = 'Effettua il login per completare il checkout.';
+          return;
+        }
+
+        if (errorResponse?.status === 400) {
+          this.errorMessage = 'Carrello vuoto o dati non validi per il checkout.';
+          return;
+        }
+
+        if (errorResponse?.status === 404) {
+          this.errorMessage = 'Alcuni prodotti non esistono piu nel catalogo.';
+          return;
+        }
+
+        this.errorMessage = 'Impossibile completare il checkout.';
       }
     });
   }

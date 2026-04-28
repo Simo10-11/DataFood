@@ -6,6 +6,12 @@
 
   <p *ngIf="loading" class="status-message">Caricamento carrello...</p>
   <p *ngIf="errorMessage" class="status-message error">{{ errorMessage }}</p>
+  <p *ngIf="checkoutMessage" class="status-message success">{{ checkoutMessage }}</p>
+
+  <div class="checkout-result" *ngIf="createdOrder">
+    <p><strong>Ordine #{{ createdOrder.id }}</strong> creato con stato: {{ createdOrder.status }}</p>
+    <a routerLink="/orders" class="back-link">Vai ai miei ordini</a>
+  </div>
 
   <div *ngIf="!loading && !errorMessage && cart.items.length === 0" class="empty-state">
     Il carrello e vuoto.
@@ -40,6 +46,9 @@
 
     <footer class="cart-total">
       <strong>Totale: {{ cart.totale | number:'1.2-2' }} EUR</strong>
+      <button type="button" class="checkout-button" (click)="checkout()">
+        Checkout
+      </button>
     </footer>
   </div>
 </section>

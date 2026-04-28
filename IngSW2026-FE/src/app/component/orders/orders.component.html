@@ -1,0 +1,33 @@
+<section class="orders-page">
+  <header class="orders-header">
+    <h2>I tuoi ordini</h2>
+    <a routerLink="/" class="back-link">Torna al catalogo</a>
+  </header>
+
+  <p *ngIf="loading" class="status-message">Caricamento ordini...</p>
+  <p *ngIf="errorMessage" class="status-message error">{{ errorMessage }}</p>
+
+  <div *ngIf="!loading && !errorMessage && orders.length === 0" class="empty-state">
+    Non hai ancora effettuato ordini.
+  </div>
+
+  <div *ngIf="!loading && !errorMessage && orders.length > 0" class="orders-list">
+    <article class="order-card" *ngFor="let order of orders">
+      <header class="order-top">
+        <h3>Ordine #{{ order.id }}</h3>
+        <span class="status">{{ order.status }}</span>
+      </header>
+
+      <p class="meta">Data: {{ order.data }}</p>
+      <p class="meta"><strong>Totale: {{ order.totale | number:'1.2-2' }} EUR</strong></p>
+
+      <div class="order-items">
+        <div class="order-item" *ngFor="let item of order.items">
+          <span>{{ item.nome }}</span>
+          <span>x{{ item.quantita }}</span>
+          <span>{{ item.prezzo | number:'1.2-2' }} EUR</span>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>

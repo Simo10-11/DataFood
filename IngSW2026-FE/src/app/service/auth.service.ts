@@ -10,8 +10,9 @@ import { Utente } from '../dto/utente.model';
 })
 export class AuthService {
 
-  private readonly loginUrl = 'http://localhost:8080/auth/login';
-  private readonly registerUrl = 'http://localhost:8080/auth/register';
+  private readonly loginUrl = '/api/auth/login';
+  private readonly registerUrl = '/api/auth/register';
+  private readonly logoutUrl = '/api/auth/logout';
   // Chiave unica del localStorage per evitare collisioni con altri dati dell'app.
   private readonly currentUserKey = 'currentUser';
 
@@ -38,7 +39,11 @@ export class AuthService {
   }
 
   logout(): void {
-    // Logout lato frontend: per ora ci basta pulire lo storage locale.
+    // Puliamo sia stato locale sia sessione backend.
+    this.http.post<void>(this.logoutUrl, {}).subscribe({
+      next: () => {},
+      error: () => {}
+    });
     localStorage.removeItem(this.currentUserKey);
   }
 }
