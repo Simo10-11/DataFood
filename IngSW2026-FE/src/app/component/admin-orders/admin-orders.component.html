@@ -1,0 +1,94 @@
+<section class="admin-orders-page">
+  <header class="page-header">
+    <div>
+      <h2>Gestione ordini</h2>
+      <p>Controlla tutti gli ordini, filtra e aggiorna lo stato.</p>
+    </div>
+    <a routerLink="/" class="back-link">Torna al catalogo</a>
+  </header>
+
+  <div class="filters-panel">
+    <label>
+      Cerca per ID o cliente
+      <input type="text" [(ngModel)]="searchText" (input)="applyFilters()" placeholder="Es. 12 o Rossi" />
+    </label>
+
+    <label>
+      Stato
+      <select [(ngModel)]="statusFilter" (change)="applyFilters()">
+        <option *ngFor="let option of statusOptions" [value]="option.value">{{ option.label }}</option>
+      </select>
+    </label>
+
+    <label>
+      Ordina per
+      <select [(ngModel)]="sortBy" (change)="applyFilters()">
+        <option *ngFor="let option of sortOptions" [value]="option.value">{{ option.label }}</option>
+      </select>
+    </label>
+
+    <label>
+      Direzione
+      <select [(ngModel)]="direction" (change)="applyFilters()">
+        <option value="desc">Decrescente</option>
+        <option value="asc">Crescente</option>
+      </select>
+    </label>
+  </div>
+
+  <p *ngIf="loading" class="status-message">Caricamento ordini...</p>
+  <p *ngIf="errorMessage" class="status-message error">{{ errorMessage }}</p>
+  <p *ngIf="successMessage" class="status-message success">{{ successMessage }}</p>
+
+  <div class="table-wrap" *ngIf="!loading && !errorMessage">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Cliente</th>
+          <th>Prodotti</th>
+          <th>Totale</th>
+          <th>Data</th>
+          <th>Stato</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let order of orders; trackBy: trackByOrderId">
+          <td>#{{ order.id }}</td>
+          <td>{{ order.nomeCliente || 'Cliente non disponibile' }}</td>
+          <td>
+            <div class="items-list">
+              <div class="item-row" *ngFor="let item of order.items">
+                <span>{{ item.nome }}</span>
+                <span>x{{ item.quantita }}</span>
+                <span>{{ item.prezzo | number:'1.2-2' }} EUR</span>
+              </div>
+            </div>
+          </td>
+          <td>{{ order.totale | number:'1.2-2' }} EUR</td>
+          <td>{{ order.data | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td>
+            <span class="status-chip" [ngClass]="getStatusClass(order.status)">
+              {{ order.status }}
+            </span>
+            <select class="status-select" [ngModel]="order.status" (ngModelChange)="updateStatus(order, $event)">
+              <option value="in_lavorazione">In lavorazione</option>
+              <option value="completato">Completato</option>
+              <option value="annullato">Annullato</option>
+            </select>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="empty-state" *ngIf="!loading && !errorMessage && orders.length === 0">
+    Nessun ordine trovato.
+  </div>
+
+  <footer class="pagination-bar" *ngIf="totalPages > 1">
+    <button type="button" (click)="changePage(-1)" [disabled]="page === 0">Pagina precedente</button>
+    <span>Pagina {{ page + 1 }} di {{ totalPages }} - {{ totalElements }} ordini</span>
+    <button type="button" (click)="changePage(1)" [disabled]="page + 1 >= totalPages">Pagina successiva</button>
+  </footer>
+</section>

@@ -26,6 +26,7 @@ public class UtenteController {
 			// Qui teniamo il controller minimale: delega tutta la logica al service.
 			UtenteDTO loggedUser = utenteService.login(request);
 			session.setAttribute("loggedUserId", loggedUser.getId());
+			session.setAttribute("loggedUserRole", loggedUser.getRuolo());
 			return ResponseEntity.ok(loggedUser);
 		} catch (IllegalArgumentException exception) {
 			// Se email/password non tornano rispondiamo 401.
@@ -47,6 +48,7 @@ public class UtenteController {
 	@PostMapping({"/auth/logout", "/api/auth/logout"})
 	public ResponseEntity<Void> logout(HttpSession session) {
 		session.removeAttribute("loggedUserId");
+		session.removeAttribute("loggedUserRole");
 		return ResponseEntity.noContent().build();
 	}
 }

@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 @Mapper(componentModel = "spring")
 public interface OrderMapper {
 
+    @Mapping(target = "nomeCliente", expression = "java(buildCustomerName(entity))")
     @Mapping(target = "data", expression = "java(entity.getData() != null ? entity.getData().toString() : null)")
     @Mapping(target = "totale", expression = "java(calculateTotal(entity))")
     OrderDTO toDTO(Ordine entity);
@@ -34,5 +35,15 @@ public interface OrderMapper {
                 .map(item -> item.getPrezzoUnitario().multiply(BigDecimal.valueOf(item.getQuantita())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add)
                 .doubleValue();
+    }
+
+    default String buildCustomerName(Ordine entity) {
+        if (entity == null || entity.getUtente() == null) {
+            return "";
+        }
+
+        String nome = entity.getUtente().getNome() != null ? entity.getUtente().getNome() : "";
+        String cognome = entity.getUtente().getCognome() != null ? entity.getUtente().getCognome() : "";
+        return (nome + " " + cognome).trim();
     }
 }

@@ -20,11 +20,11 @@ export class AuthService {
 
   login(data: LoginRequest): Observable<Utente> {
     // Chiamata semplice al backend: niente token per ora, ci basta salvare i dati utente.
-    return this.http.post<Utente>(this.loginUrl, data);
+    return this.http.post<Utente>(this.loginUrl, data, { withCredentials: true });
   }
 
   register(data: RegisterRequest): Observable<Utente> {
-    return this.http.post<Utente>(this.registerUrl, data);
+    return this.http.post<Utente>(this.registerUrl, data, { withCredentials: true });
   }
 
   saveCurrentUser(user: Utente): void {
@@ -40,7 +40,7 @@ export class AuthService {
 
   logout(): void {
     // Puliamo sia stato locale sia sessione backend.
-    this.http.post<void>(this.logoutUrl, {}).subscribe({
+    this.http.post<void>(this.logoutUrl, {}, { withCredentials: true }).subscribe({
       next: () => {},
       error: () => {}
     });
