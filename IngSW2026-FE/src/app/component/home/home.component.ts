@@ -5,6 +5,8 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
 import { ProductCardComponent } from '../product-card/product-card.component';
 import { ProductService } from '../../service/product.service';
 import { CategoriaService } from '../../service/categoria.service';
+import { WishlistService } from '../../service/wishlist.service';
+import { AuthService } from '../../service/auth.service';
 import { Prodotto } from '../../dto/prodotto.model';
 import { Categoria } from '../../dto/categoria.model';
 
@@ -20,16 +22,42 @@ export class HomeComponent implements OnInit {
   categorie: Categoria[] = [];
   categoriaSelezionataId?: number;
   searchTerm = '';
+  wishlistProductIds = new Set<number>();
 
   constructor(
     private productService: ProductService,
-    private categoriaService: CategoriaService
+    private categoriaService: CategoriaService,
+    private wishlistService: WishlistService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
     // Carica dati iniziali della homepage catalogo.
     this.loadProdotti();
     this.loadCategorie();
+    this.loadWishlistState();
+  }
+
+  private loadWishlistState(): void {
+    const utenteId = this.authService.getCurrentUser()?.id;
+    if (!utenteId) {
+      this.wishlistProductIds.clear();
+      return;
+    }
+
+    this.wishlistService.getWishlistByUtente(utenteId).subscribe({
+      next: (rows) => {
+        this.wishlistProductIds = new Set(
+          rows
+            .map((item) => item.prodottoId)
+            .filter((id): id is number => !!id)
+        );
+      },
+      error: () => {
+        // Se la chiamata fallisce, evitiamo blocchi UI e mostriamo cuori non attivi.
+        this.wishlistProductIds.clear();
+      }
+    });
   }
 
   loadProdotti(): void {

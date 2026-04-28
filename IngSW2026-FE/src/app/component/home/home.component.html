@@ -20,6 +20,7 @@
         <app-product-card
           *ngFor="let prodotto of prodotti"
           [prodotto]="prodotto"
+          [isInWishlist]="wishlistProductIds.has(prodotto.id)"
         ></app-product-card>
       </div>
 

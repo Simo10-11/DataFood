@@ -1,0 +1,32 @@
+<section class="wishlist-page">
+  <header class="wishlist-header">
+    <h2>La tua wishlist</h2>
+    <a routerLink="/" class="back-link">Torna al catalogo</a>
+  </header>
+
+  <p *ngIf="loading" class="status-message">Caricamento wishlist...</p>
+  <p *ngIf="errorMessage" class="status-message error">{{ errorMessage }}</p>
+
+  <div *ngIf="!loading && !errorMessage && items.length === 0" class="empty-state">
+    Nessun prodotto nella wishlist.
+  </div>
+
+  <div class="wishlist-grid" *ngIf="!loading && !errorMessage && items.length > 0">
+    <article class="wishlist-card" *ngFor="let item of items">
+      <div class="image-shell">
+        <img *ngIf="item.imageUrl" [src]="item.imageUrl" [alt]="item.nome" class="product-image" />
+        <div *ngIf="!item.imageUrl" class="product-image-fallback">Foto in arrivo</div>
+      </div>
+
+      <div class="content">
+        <h3>{{ item.nome }}</h3>
+        <p>{{ item.descrizione }}</p>
+        <strong>{{ item.prezzo | number:'1.2-2' }} EUR</strong>
+      </div>
+
+      <button type="button" class="remove-button" (click)="removeFromWishlist(item)">
+        Rimuovi
+      </button>
+    </article>
+  </div>
+</section>
