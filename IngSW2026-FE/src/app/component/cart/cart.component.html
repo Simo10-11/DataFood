@@ -1,0 +1,45 @@
+<section class="cart-page">
+  <header class="cart-header">
+    <h2>Il tuo carrello</h2>
+    <a routerLink="/" class="back-link">Torna al catalogo</a>
+  </header>
+
+  <p *ngIf="loading" class="status-message">Caricamento carrello...</p>
+  <p *ngIf="errorMessage" class="status-message error">{{ errorMessage }}</p>
+
+  <div *ngIf="!loading && !errorMessage && cart.items.length === 0" class="empty-state">
+    Il carrello e vuoto.
+  </div>
+
+  <div class="cart-list" *ngIf="!loading && !errorMessage && cart.items.length > 0">
+    <article class="cart-item" *ngFor="let item of cart.items">
+      <div class="item-info">
+        <h3>{{ item.nome }}</h3>
+        <p>{{ item.prezzo | number:'1.2-2' }} EUR</p>
+      </div>
+
+      <div class="quantity-controls">
+        <button type="button" (click)="decreaseQuantity(item)">-</button>
+        <input
+          type="number"
+          min="0"
+          [value]="item.quantita"
+          (change)="updateQuantityFromInput(item.productId, $any($event.target).value)"
+        />
+        <button type="button" (click)="increaseQuantity(item)">+</button>
+      </div>
+
+      <p class="line-total">
+        {{ (item.prezzo * item.quantita) | number:'1.2-2' }} EUR
+      </p>
+
+      <button type="button" class="remove-button" (click)="removeItem(item.productId)">
+        Rimuovi
+      </button>
+    </article>
+
+    <footer class="cart-total">
+      <strong>Totale: {{ cart.totale | number:'1.2-2' }} EUR</strong>
+    </footer>
+  </div>
+</section>

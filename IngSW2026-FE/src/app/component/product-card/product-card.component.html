@@ -31,4 +31,7 @@
   <button type="button" class="cart-button" [disabled]="quantity === 0" (click)="addToCart()">
     Aggiungi al carrello
   </button>
+
+  <p class="cart-feedback" *ngIf="cartMessage">{{ cartMessage }}</p>
+  <p class="cart-feedback error" *ngIf="cartErrorMessage">{{ cartErrorMessage }}</p>
 </article>

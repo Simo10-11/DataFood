@@ -19,6 +19,7 @@
     </div>
 
     <div class="actions">
+      <button class="login-button" type="button" routerLink="/cart">Carrello</button>
       <button *ngIf="!currentUser" class="login-button" type="button" routerLink="/login">LOGIN</button>
       <button *ngIf="!currentUser" class="login-button" type="button" routerLink="/register">REGISTER</button>
       <ng-container *ngIf="currentUser as user">

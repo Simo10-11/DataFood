@@ -136,6 +136,16 @@ h4 {
   opacity: 0.5;
 }
 
+.cart-feedback {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #2d6a4f;
+}
+
+.cart-feedback.error {
+  color: #b00020;
+}
+
 @media (max-width: 900px) {
   .product-card {
     padding: 0.65rem;
