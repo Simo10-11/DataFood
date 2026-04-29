@@ -4,6 +4,22 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Order, OrderStatusOption } from '../../dto/order.model';
 import { OrderService, OrderPageResponse } from '../../service/order.service';
+import { ProductService } from '../../service/product.service';
+import { CategoriaService } from '../../service/categoria.service';
+import { Categoria } from '../../dto/categoria.model';
+import { Prodotto } from '../../dto/prodotto.model';
+
+type AdminSection = 'orders' | 'products';
+
+interface ProductFormModel {
+  id?: number;
+  nome: string;
+  descrizione: string;
+  prezzo: number | null;
+  quantitaDisponibile: number;
+  imageUrl: string;
+  idCategoria?: number;
+}
 
 @Component({
   selector: 'app-admin-orders',
@@ -13,10 +29,23 @@ import { OrderService, OrderPageResponse } from '../../service/order.service';
   styleUrl: './admin-orders.component.scss'
 })
 export class AdminOrdersComponent implements OnInit {
+  activeSection: AdminSection = 'orders';
+
   orders: Order[] = [];
   loading = false;
   errorMessage = '';
   successMessage = '';
+
+  products: Prodotto[] = [];
+  categories: Categoria[] = [];
+  productLoading = false;
+  productErrorMessage = '';
+  productSuccessMessage = '';
+  productSearchText = '';
+  productCategoryFilter = 'all';
+  productSortBy = 'nome';
+  productDirection = 'asc';
+  productForm: ProductFormModel = this.emptyProductForm();
 
   page = 0;
   size = 10;
@@ -41,10 +70,20 @@ export class AdminOrdersComponent implements OnInit {
     { value: 'totale', label: 'Totale' }
   ];
 
-  constructor(private orderService: OrderService) {}
+  constructor(
+    private orderService: OrderService,
+    private productService: ProductService,
+    private categoriaService: CategoriaService
+  ) {}
 
   ngOnInit(): void {
     this.loadOrders();
+    this.loadProducts();
+    this.loadCategories();
+  }
+
+  switchSection(section: AdminSection): void {
+    this.activeSection = section;
   }
 
   loadOrders(): void {
@@ -145,5 +184,232 @@ export class AdminOrdersComponent implements OnInit {
       default:
         return 'status-processing';
     }
+  }
+
+  loadProducts(): void {
+    this.productLoading = true;
+    this.productErrorMessage = '';
+
+    this.productService.getAllAdmin().subscribe({
+      next: (items) => {
+        this.products = (items ?? []).map((product) => this.normalizeProduct(product));
+        this.productLoading = false;
+      },
+      error: (errorResponse) => {
+        this.productLoading = false;
+        if (errorResponse?.status === 403) {
+          this.productErrorMessage = 'Non sei autorizzato a visualizzare i prodotti admin.';
+          return;
+        }
+
+        this.productErrorMessage = 'Impossibile caricare i prodotti.';
+      }
+    });
+  }
+
+  loadCategories(): void {
+    this.categoriaService.getAll().subscribe({
+      next: (items) => {
+        this.categories = items ?? [];
+      },
+      error: () => {
+        this.categories = [];
+      }
+    });
+  }
+
+  get visibleProducts(): Prodotto[] {
+    const normalizedSearch = this.productSearchText.trim().toLowerCase();
+    const selectedCategoryId = this.productCategoryFilter === 'all'
+      ? undefined
+      : Number(this.productCategoryFilter);
+
+    return [...this.products]
+      .filter((product) => {
+        if (!normalizedSearch) {
+          return true;
+        }
+
+        const nameMatch = product.nome.toLowerCase().includes(normalizedSearch);
+        const descriptionMatch = (product.descrizione ?? '').toLowerCase().includes(normalizedSearch);
+        return nameMatch || descriptionMatch;
+      })
+      .filter((product) => {
+        if (selectedCategoryId === undefined || Number.isNaN(selectedCategoryId)) {
+          return true;
+        }
+        return product.idCategoria === selectedCategoryId;
+      })
+      .sort((left, right) => this.compareProducts(left, right));
+  }
+
+  applyProductFilters(): void {
+    // Filtri locali: il pannello resta reattivo e coerente con il catalogo.
+  }
+
+  startCreateProduct(): void {
+    this.productForm = this.emptyProductForm();
+    this.productSuccessMessage = '';
+    this.productErrorMessage = '';
+  }
+
+  editProduct(product: Prodotto): void {
+    this.productForm = {
+      id: product.id,
+      nome: product.nome ?? '',
+      descrizione: product.descrizione ?? '',
+      prezzo: product.prezzo ?? null,
+      quantitaDisponibile: product.quantitaDisponibile ?? 0,
+      imageUrl: product.imageUrl ?? '',
+      idCategoria: product.idCategoria
+    };
+    this.productSuccessMessage = '';
+    this.productErrorMessage = '';
+    this.switchSection('products');
+  }
+
+  cancelEditingProduct(): void {
+    this.startCreateProduct();
+  }
+
+  saveProduct(): void {
+    if (!this.isProductFormValid()) {
+      this.productErrorMessage = 'Compila tutti i campi obbligatori e verifica i valori.';
+      return;
+    }
+
+    const payload: Partial<Prodotto> = {
+      nome: this.productForm.nome.trim(),
+      descrizione: this.productForm.descrizione?.trim() || '',
+      prezzo: Number(this.productForm.prezzo),
+      quantitaDisponibile: Number(this.productForm.quantitaDisponibile),
+      imageUrl: this.productForm.imageUrl?.trim() || null,
+      idCategoria: this.productForm.idCategoria
+    } as Partial<Prodotto>;
+
+    this.productErrorMessage = '';
+    this.productSuccessMessage = '';
+
+    const request$ = this.productForm.id
+      ? this.productService.updateProduct(this.productForm.id, payload)
+      : this.productService.createProduct(payload);
+
+    request$.subscribe({
+      next: () => {
+        this.productSuccessMessage = this.productForm.id
+          ? 'Prodotto aggiornato con successo.'
+          : 'Prodotto creato con successo.';
+        this.loadProducts();
+        this.startCreateProduct();
+      },
+      error: (errorResponse) => {
+        if (errorResponse?.status === 403) {
+          this.productErrorMessage = 'Non sei autorizzato a modificare i prodotti.';
+          return;
+        }
+
+        if (errorResponse?.status === 404) {
+          this.productErrorMessage = 'Categoria o prodotto non trovato.';
+          return;
+        }
+
+        this.productErrorMessage = 'Impossibile salvare il prodotto.';
+      }
+    });
+  }
+
+  deleteProduct(product: Prodotto): void {
+    if (!product.id) {
+      return;
+    }
+
+    const confirmed = window.confirm(`Eliminare definitivamente il prodotto "${product.nome}"?`);
+    if (!confirmed) {
+      return;
+    }
+
+    this.productErrorMessage = '';
+    this.productSuccessMessage = '';
+
+    this.productService.deleteProduct(product.id).subscribe({
+      next: () => {
+        this.productSuccessMessage = 'Prodotto eliminato con successo.';
+        this.loadProducts();
+        if (this.productForm.id === product.id) {
+          this.startCreateProduct();
+        }
+      },
+      error: (errorResponse) => {
+        if (errorResponse?.status === 403) {
+          this.productErrorMessage = 'Non sei autorizzato a eliminare i prodotti.';
+          return;
+        }
+
+        if (errorResponse?.status === 404) {
+          this.productErrorMessage = 'Prodotto non trovato.';
+          return;
+        }
+
+        this.productErrorMessage = 'Impossibile eliminare il prodotto.';
+      }
+    });
+  }
+
+  getCategoryName(categoryId: number | undefined): string {
+    if (categoryId === undefined) {
+      return 'Categoria non disponibile';
+    }
+
+    const category = this.categories.find((item) => (item.id ?? item.ID) === categoryId);
+    return category?.nome ?? 'Categoria non disponibile';
+  }
+
+  private compareProducts(left: Prodotto, right: Prodotto): number {
+    let comparison = 0;
+
+    switch (this.productSortBy) {
+      case 'prezzo':
+        comparison = (left.prezzo ?? 0) - (right.prezzo ?? 0);
+        break;
+      case 'categoria':
+        comparison = this.getCategoryName(left.idCategoria).localeCompare(this.getCategoryName(right.idCategoria));
+        break;
+      default:
+        comparison = (left.nome ?? '').localeCompare(right.nome ?? '');
+        break;
+    }
+
+    return this.productDirection === 'desc' ? -comparison : comparison;
+  }
+
+  private isProductFormValid(): boolean {
+    return !!this.productForm.nome?.trim()
+      && this.productForm.prezzo !== null
+      && Number(this.productForm.prezzo) > 0
+      && Number(this.productForm.quantitaDisponibile) >= 0
+      && this.productForm.idCategoria !== undefined;
+  }
+
+  private emptyProductForm(): ProductFormModel {
+    return {
+      nome: '',
+      descrizione: '',
+      prezzo: null,
+      quantitaDisponibile: 0,
+      imageUrl: '',
+      idCategoria: undefined
+    };
+  }
+
+  private normalizeProduct(product: Prodotto): Prodotto {
+    return {
+      ...product,
+      id: Number(product.id),
+      prezzo: Number(product.prezzo) || 0,
+      quantitaDisponibile: Number(product.quantitaDisponibile) || 0,
+      imageUrl: product.imageUrl ?? null,
+      idCategoria: Number(product.idCategoria),
+      nomeCategoria: product.nomeCategoria ?? this.getCategoryName(product.idCategoria)
+    };
   }
 }

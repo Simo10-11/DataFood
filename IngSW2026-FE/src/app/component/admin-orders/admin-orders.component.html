@@ -1,12 +1,22 @@
 <section class="admin-orders-page">
   <header class="page-header">
     <div>
-      <h2>Gestione ordini</h2>
-      <p>Controlla tutti gli ordini, filtra e aggiorna lo stato.</p>
+      <h2>Pannello amministrazione</h2>
+      <p>Gestisci ordini e prodotti in un'unica area coerente con l'app.</p>
     </div>
     <a routerLink="/" class="back-link">Torna al catalogo</a>
   </header>
 
+  <div class="admin-tabs">
+    <button type="button" [class.active]="activeSection === 'orders'" (click)="switchSection('orders')">
+      Ordini
+    </button>
+    <button type="button" [class.active]="activeSection === 'products'" (click)="switchSection('products')">
+      Prodotti
+    </button>
+  </div>
+
+  <section *ngIf="activeSection === 'orders'">
   <div class="filters-panel">
     <label>
       Cerca per ID o cliente
@@ -91,4 +101,134 @@
     <span>Pagina {{ page + 1 }} di {{ totalPages }} - {{ totalElements }} ordini</span>
     <button type="button" (click)="changePage(1)" [disabled]="page + 1 >= totalPages">Pagina successiva</button>
   </footer>
+  </section>
+
+  <section *ngIf="activeSection === 'products'" class="products-section">
+    <div class="product-toolbar">
+      <div class="filters-panel compact">
+        <label>
+          Cerca prodotto
+          <input type="text" [(ngModel)]="productSearchText" (input)="applyProductFilters()" placeholder="Nome o descrizione" />
+        </label>
+
+        <label>
+          Categoria
+          <select [(ngModel)]="productCategoryFilter" (change)="applyProductFilters()">
+            <option value="all">Tutte le categorie</option>
+            <option *ngFor="let category of categories" [value]="category.id ?? category.ID">
+              {{ category.nome }}
+            </option>
+          </select>
+        </label>
+
+        <label>
+          Ordina per
+          <select [(ngModel)]="productSortBy" (change)="applyProductFilters()">
+            <option value="nome">Nome</option>
+            <option value="categoria">Categoria</option>
+            <option value="prezzo">Prezzo</option>
+          </select>
+        </label>
+
+        <label>
+          Direzione
+          <select [(ngModel)]="productDirection" (change)="applyProductFilters()">
+            <option value="asc">Crescente</option>
+            <option value="desc">Decrescente</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="product-form-card">
+        <div class="product-form-header">
+          <div>
+            <h3>{{ productForm.id ? 'Modifica prodotto' : 'Nuovo prodotto' }}</h3>
+            <p>{{ productForm.id ? 'Aggiorna i dati del prodotto selezionato.' : 'Inserisci un nuovo prodotto nel catalogo.' }}</p>
+          </div>
+          <button type="button" class="secondary-button" (click)="cancelEditingProduct()">Pulisci</button>
+        </div>
+
+        <div class="product-form-grid">
+          <label>
+            Nome prodotto *
+            <input type="text" [(ngModel)]="productForm.nome" placeholder="Es. Yogurt greco" />
+          </label>
+
+          <label>
+            Categoria *
+            <select [(ngModel)]="productForm.idCategoria">
+              <option [ngValue]="undefined">Seleziona categoria</option>
+              <option *ngFor="let category of categories" [ngValue]="category.id ?? category.ID">
+                {{ category.nome }}
+              </option>
+            </select>
+          </label>
+
+          <label>
+            Prezzo *
+            <input type="number" min="0" step="0.01" [(ngModel)]="productForm.prezzo" placeholder="0.00" />
+          </label>
+
+          <label>
+            Quantità disponibile *
+            <input type="number" min="0" step="1" [(ngModel)]="productForm.quantitaDisponibile" />
+          </label>
+
+          <label class="wide-field">
+            Descrizione
+            <textarea [(ngModel)]="productForm.descrizione" rows="3" placeholder="Descrizione prodotto"></textarea>
+          </label>
+
+          <label class="wide-field">
+            Image URL
+            <input type="text" [(ngModel)]="productForm.imageUrl" placeholder="https://..." />
+          </label>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="primary-button" (click)="saveProduct()">
+            {{ productForm.id ? 'Salva modifiche' : 'Aggiungi prodotto' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <p *ngIf="productLoading" class="status-message">Caricamento prodotti...</p>
+    <p *ngIf="productErrorMessage" class="status-message error">{{ productErrorMessage }}</p>
+    <p *ngIf="productSuccessMessage" class="status-message success">{{ productSuccessMessage }}</p>
+
+    <div class="table-wrap" *ngIf="!productLoading && !productErrorMessage">
+      <table class="orders-table products-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Categoria</th>
+            <th>Prezzo</th>
+            <th>Quantità</th>
+            <th>Descrizione</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of visibleProducts">
+            <td>{{ product.nome }}</td>
+            <td>{{ product.nomeCategoria || getCategoryName(product.idCategoria) }}</td>
+            <td>{{ product.prezzo | number:'1.2-2' }} EUR</td>
+            <td>{{ product.quantitaDisponibile }}</td>
+            <td>{{ product.descrizione || 'Nessuna descrizione' }}</td>
+            <td>
+              <div class="row-actions">
+                <button type="button" class="secondary-button" (click)="editProduct(product)">Modifica</button>
+                <button type="button" class="danger-button" (click)="deleteProduct(product)">Elimina</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="empty-state" *ngIf="!productLoading && !productErrorMessage && visibleProducts.length === 0">
+      Nessun prodotto trovato.
+    </div>
+  </section>
 </section>

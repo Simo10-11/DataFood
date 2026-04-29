@@ -17,6 +17,10 @@ export class ProductService {
     return this.http.get<Prodotto[]>(this.apiUrl);
   }
 
+  getAllAdmin(): Observable<Prodotto[]> {
+    return this.http.get<Prodotto[]>(this.apiUrl, { withCredentials: true });
+  }
+
   searchByNome(nome: string | undefined): Observable<Prodotto[]> {
     const safeNome = nome ?? '';
     // GET ricerca per nome con query param ?nome=...
@@ -30,5 +34,17 @@ export class ProductService {
     }
     // GET prodotti filtrati per categoria.
     return this.http.get<Prodotto[]>(`${this.apiUrl}/categoria/${id}`);
+  }
+
+  createProduct(product: Partial<Prodotto>): Observable<Prodotto> {
+    return this.http.post<Prodotto>(this.apiUrl, product, { withCredentials: true });
+  }
+
+  updateProduct(productId: number, product: Partial<Prodotto>): Observable<Prodotto> {
+    return this.http.put<Prodotto>(`${this.apiUrl}/${productId}`, product, { withCredentials: true });
+  }
+
+  deleteProduct(productId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${productId}`, { withCredentials: true });
   }
 }
