@@ -6,7 +6,7 @@ import it.unife.sample.backend.model.Prodotto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-// MapStruct genera automaticamente l'implementazione di questa interfaccia a compile-time.
+// MapStruct genera automaticamente l'implementazione di questa interfaccia 
 @Mapper(componentModel = "spring")
 public interface ProdottoMapper {
 

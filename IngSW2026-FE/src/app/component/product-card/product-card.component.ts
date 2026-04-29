@@ -59,12 +59,23 @@ export class ProductCardComponent {
       prodottoId: prodottoId
     };
 
+    if (this.wishlistSelected) {
+      this.wishlistService.removeFromWishlistByProduct(this.utenteId, prodottoId).subscribe({
+        next: () => {
+          this.wishlistSelected = false;
+        },
+        error: () => {
+          this.wishlistSelected = true;
+        }
+      });
+      return;
+    }
+
     this.wishlistService.addToWishlist(wishlist).subscribe({
       next: () => {
         this.wishlistSelected = true;
       },
       error: () => {
-        // Se il backend rifiuta per duplicato, manteniamo il cuore attivo.
         this.wishlistSelected = true;
       }
     });

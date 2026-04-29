@@ -27,4 +27,8 @@ export class WishlistService {
   removeFromWishlist(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  removeFromWishlistByProduct(utenteId: number, prodottoId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}?utenteId=${utenteId}&prodottoId=${prodottoId}`);
+  }
 }

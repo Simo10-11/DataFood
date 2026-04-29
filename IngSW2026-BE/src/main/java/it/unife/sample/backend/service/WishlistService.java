@@ -63,4 +63,14 @@ public class WishlistService {
         }
         wishlistRepository.deleteById(id);
     }
+
+    public void removeFromWishlist(Long utenteId, Integer prodottoId) {
+        if (utenteId == null || prodottoId == null) {
+            throw new IllegalArgumentException("utenteId e prodottoId sono obbligatori");
+        }
+
+        Wishlist wishlist = wishlistRepository.findByUtenteIdAndProdottoId(utenteId, prodottoId)
+                .orElseThrow(() -> new IllegalArgumentException("Elemento wishlist non trovato"));
+        wishlistRepository.delete(wishlist);
+    }
 }

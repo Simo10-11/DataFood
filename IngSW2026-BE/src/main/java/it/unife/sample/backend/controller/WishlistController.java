@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,6 +46,19 @@ public class WishlistController {
     public ResponseEntity<Void> removeFromWishlist(@PathVariable Long id) {
         try {
             wishlistService.removeFromWishlist(id);
+            return ResponseEntity.noContent().build();
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> removeFromWishlistByProduct(
+            @RequestParam Long utenteId,
+            @RequestParam Integer prodottoId
+    ) {
+        try {
+            wishlistService.removeFromWishlist(utenteId, prodottoId);
             return ResponseEntity.noContent().build();
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
