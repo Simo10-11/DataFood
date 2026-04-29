@@ -112,6 +112,10 @@
   margin-bottom: 0;
 }
 
+.category-filters {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .product-form-card {
   border-radius: 0.9rem;
   padding: 1rem;
@@ -205,6 +209,14 @@
   min-width: 170px;
 }
 
+.categories-table td:last-child {
+  min-width: 170px;
+}
+
+.category-form-grid {
+  grid-template-columns: 1fr;
+}
+
 .orders-table {
   width: 100%;
   border-collapse: collapse;
@@ -296,6 +308,10 @@
   }
 
   .product-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .category-filters {
     grid-template-columns: 1fr;
   }
 }

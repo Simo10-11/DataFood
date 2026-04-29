@@ -9,7 +9,7 @@ import { CategoriaService } from '../../service/categoria.service';
 import { Categoria } from '../../dto/categoria.model';
 import { Prodotto } from '../../dto/prodotto.model';
 
-type AdminSection = 'orders' | 'products';
+type AdminSection = 'orders' | 'products' | 'categories';
 
 interface ProductFormModel {
   id?: number;
@@ -19,6 +19,12 @@ interface ProductFormModel {
   quantitaDisponibile: number;
   imageUrl: string;
   idCategoria?: number;
+}
+
+interface CategoryFormModel {
+  id?: number;
+  nome: string;
+  descrizione: string;
 }
 
 @Component({
@@ -46,6 +52,13 @@ export class AdminOrdersComponent implements OnInit {
   productSortBy = 'nome';
   productDirection = 'asc';
   productForm: ProductFormModel = this.emptyProductForm();
+
+  categoryLoading = false;
+  categoryErrorMessage = '';
+  categorySuccessMessage = '';
+  categorySearchText = '';
+  categoryDirection: 'asc' | 'desc' = 'asc';
+  categoryForm: CategoryFormModel = this.emptyCategoryForm();
 
   page = 0;
   size = 10;
@@ -208,12 +221,158 @@ export class AdminOrdersComponent implements OnInit {
   }
 
   loadCategories(): void {
-    this.categoriaService.getAll().subscribe({
+    this.categoryLoading = true;
+    this.categoryErrorMessage = '';
+
+    this.categoriaService.getAllAdmin().subscribe({
       next: (items) => {
         this.categories = items ?? [];
+        this.categoryLoading = false;
       },
-      error: () => {
+      error: (errorResponse) => {
         this.categories = [];
+        this.categoryLoading = false;
+
+        if (errorResponse?.status === 403) {
+          this.categoryErrorMessage = 'Non sei autorizzato a visualizzare le categorie admin.';
+          return;
+        }
+
+        this.categoryErrorMessage = 'Impossibile caricare le categorie.';
+      }
+    });
+  }
+
+  get visibleCategories(): Categoria[] {
+    const normalizedSearch = this.categorySearchText.trim().toLowerCase();
+
+    const sorted = [...this.categories]
+      .filter((category) => {
+        if (!normalizedSearch) {
+          return true;
+        }
+
+        const nameMatch = category.nome.toLowerCase().includes(normalizedSearch);
+        const descriptionMatch = (category.descrizione ?? '').toLowerCase().includes(normalizedSearch);
+        return nameMatch || descriptionMatch;
+      })
+      .sort((left, right) => (left.nome ?? '').localeCompare(right.nome ?? ''));
+
+    return this.categoryDirection === 'desc' ? sorted.reverse() : sorted;
+  }
+
+  applyCategoryFilters(): void {
+    // Filtri locali per mantenere la UI fluida e consistente.
+  }
+
+  startCreateCategory(): void {
+    this.categoryForm = this.emptyCategoryForm();
+    this.categoryErrorMessage = '';
+    this.categorySuccessMessage = '';
+  }
+
+  editCategory(category: Categoria): void {
+    this.categoryForm = {
+      id: category.id ?? category.ID,
+      nome: category.nome ?? '',
+      descrizione: category.descrizione ?? ''
+    };
+
+    this.categoryErrorMessage = '';
+    this.categorySuccessMessage = '';
+    this.switchSection('categories');
+  }
+
+  cancelEditingCategory(): void {
+    this.startCreateCategory();
+  }
+
+  saveCategory(): void {
+    if (!this.isCategoryFormValid()) {
+      this.categoryErrorMessage = 'Il nome categoria e obbligatorio.';
+      return;
+    }
+
+    const payload: Partial<Categoria> = {
+      nome: this.categoryForm.nome.trim(),
+      descrizione: this.categoryForm.descrizione?.trim() || ''
+    };
+
+    this.categoryErrorMessage = '';
+    this.categorySuccessMessage = '';
+
+    const request$ = this.categoryForm.id
+      ? this.categoriaService.updateCategory(this.categoryForm.id, payload)
+      : this.categoriaService.createCategory(payload);
+
+    request$.subscribe({
+      next: () => {
+        this.categorySuccessMessage = this.categoryForm.id
+          ? 'Categoria aggiornata con successo.'
+          : 'Categoria creata con successo.';
+        this.loadCategories();
+        this.startCreateCategory();
+      },
+      error: (errorResponse) => {
+        if (errorResponse?.status === 403) {
+          this.categoryErrorMessage = 'Non sei autorizzato a modificare le categorie.';
+          return;
+        }
+
+        if (errorResponse?.status === 404) {
+          this.categoryErrorMessage = 'Categoria non trovata.';
+          return;
+        }
+
+        if (errorResponse?.status === 400) {
+          this.categoryErrorMessage = 'Nome non valido o gia esistente.';
+          return;
+        }
+
+        this.categoryErrorMessage = 'Impossibile salvare la categoria.';
+      }
+    });
+  }
+
+  deleteCategory(category: Categoria): void {
+    const categoryId = category.id ?? category.ID;
+    if (!categoryId) {
+      return;
+    }
+
+    const confirmed = window.confirm(`Eliminare la categoria "${category.nome}"?`);
+    if (!confirmed) {
+      return;
+    }
+
+    this.categoryErrorMessage = '';
+    this.categorySuccessMessage = '';
+
+    this.categoriaService.deleteCategory(categoryId).subscribe({
+      next: () => {
+        this.categorySuccessMessage = 'Categoria eliminata con successo.';
+        this.loadCategories();
+        if (this.categoryForm.id === categoryId) {
+          this.startCreateCategory();
+        }
+      },
+      error: (errorResponse) => {
+        if (errorResponse?.status === 403) {
+          this.categoryErrorMessage = 'Non sei autorizzato a eliminare le categorie.';
+          return;
+        }
+
+        if (errorResponse?.status === 409) {
+          this.categoryErrorMessage = 'Categoria collegata a prodotti: eliminazione bloccata.';
+          return;
+        }
+
+        if (errorResponse?.status === 404) {
+          this.categoryErrorMessage = 'Categoria non trovata.';
+          return;
+        }
+
+        this.categoryErrorMessage = 'Impossibile eliminare la categoria.';
       }
     });
   }
@@ -399,6 +558,17 @@ export class AdminOrdersComponent implements OnInit {
       imageUrl: '',
       idCategoria: undefined
     };
+  }
+
+  private emptyCategoryForm(): CategoryFormModel {
+    return {
+      nome: '',
+      descrizione: ''
+    };
+  }
+
+  private isCategoryFormValid(): boolean {
+    return !!this.categoryForm.nome?.trim();
   }
 
   private normalizeProduct(product: Prodotto): Prodotto {
