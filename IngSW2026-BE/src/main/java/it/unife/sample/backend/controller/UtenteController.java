@@ -51,4 +51,18 @@ public class UtenteController {
 		session.removeAttribute("loggedUserRole");
 		return ResponseEntity.noContent().build();
 	}
+
+	@PostMapping({"/auth/session", "/api/auth/session"})
+	public ResponseEntity<UtenteDTO> restoreSession(@RequestBody RestoreSessionRequest request, HttpSession session) {
+		try {
+			// Ripristino la sessione lato server usando l utente salvato nel browser
+			return ResponseEntity.ok(utenteService.restoreSession(request.userId(), session));
+		} catch (IllegalArgumentException exception) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+	}
+
+	// Serve solo per ricevere l id utente dal frontend all avvio
+	private record RestoreSessionRequest(Long userId) {
+	}
 }

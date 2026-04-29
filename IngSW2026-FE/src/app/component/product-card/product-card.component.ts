@@ -46,7 +46,7 @@ export class ProductCardComponent {
   addToWishlist(prodottoId: number | undefined): void {
     this.utenteId = this.authService.getCurrentUser()?.id;
 
-    // Guardia importante: evita chiamate con valori undefined.
+    // Guardia base per evitare chiamate con valori undefined
     if (!this.utenteId || !prodottoId) {
       if (!this.utenteId) {
         this.showLoginRequiredPopup();
@@ -60,6 +60,7 @@ export class ProductCardComponent {
     };
 
     if (this.wishlistSelected) {
+      // Se il cuore è già pieno allora faccio la rimozione invece dell aggiunta
       this.wishlistService.removeFromWishlistByProduct(this.utenteId, prodottoId).subscribe({
         next: () => {
           this.wishlistSelected = false;
@@ -108,6 +109,7 @@ export class ProductCardComponent {
   }
 
   private showLoginRequiredPopup(): void {
+    // Messaggio semplice come per gli altri casi in cui serve il login
     window.alert('Non puoi aggiungere prodotti se non sei loggato.');
   }
 }

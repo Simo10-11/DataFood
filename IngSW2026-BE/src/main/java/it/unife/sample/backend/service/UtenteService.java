@@ -58,5 +58,20 @@ public class UtenteService {
 		Utente salvato = utenteRepository.save(nuovoUtente);
 		return utenteMapper.toDTO(salvato);
 	}
+
+	public UtenteDTO restoreSession(Long userId, jakarta.servlet.http.HttpSession session) {
+		if (userId == null) {
+			throw new IllegalArgumentException("Utente non trovato");
+		}
+
+		// Recupero l utente dal db e ricreo i dati di sessione usati dal backend
+		Utente utente = utenteRepository.findById(userId)
+				.orElseThrow(() -> new IllegalArgumentException("Utente non trovato"));
+
+		session.setAttribute("loggedUserId", utente.getId());
+		session.setAttribute("loggedUserRole", utente.getRuolo());
+
+		return utenteMapper.toDTO(utente);
+	}
 }
 

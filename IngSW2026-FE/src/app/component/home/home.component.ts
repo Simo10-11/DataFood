@@ -34,11 +34,12 @@ export class HomeComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Carica dati iniziali della homepage catalogo.
+    // Carica dati iniziali della homepage catalogo
     this.loadProdotti();
     this.loadCategorie();
     this.loadWishlistState();
 
+    // Quando cambia l utente aggiorno subito i cuori della wishlist
     this.authSubscription = this.authService.currentUser$.subscribe(() => {
       this.loadWishlistState();
     });
