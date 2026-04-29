@@ -17,6 +17,9 @@
     <button type="button" [class.active]="activeSection === 'categories'" (click)="switchSection('categories')">
       Categorie
     </button>
+    <button type="button" [class.active]="activeSection === 'users'" (click)="switchSection('users')">
+      Utenti
+    </button>
   </div>
 
   <section *ngIf="activeSection === 'orders'">
@@ -316,6 +319,87 @@
 
     <div class="empty-state" *ngIf="!categoryLoading && !categoryErrorMessage && visibleCategories.length === 0">
       Nessuna categoria trovata.
+    </div>
+  </section>
+
+  <section *ngIf="activeSection === 'users'" class="products-section">
+    <div class="product-toolbar">
+      <div class="filters-panel compact user-filters">
+        <label>
+          Cerca utente
+          <input
+            type="text"
+            [(ngModel)]="userSearchText"
+            (input)="applyUserFilters()"
+            placeholder="Nome, cognome o email"
+          />
+        </label>
+
+        <label>
+          Ruolo
+          <select [(ngModel)]="userRoleFilter" (change)="applyUserFilters()">
+            <option value="all">Tutti i ruoli</option>
+            <option value="cliente">Cliente</option>
+            <option value="admin">Admin</option>
+          </select>
+        </label>
+
+        <label>
+          Ordina per
+          <select [(ngModel)]="userSortBy" (change)="applyUserFilters()">
+            <option value="nome">Nome</option>
+            <option value="email">Email</option>
+            <option value="ruolo">Ruolo</option>
+          </select>
+        </label>
+
+        <label>
+          Direzione
+          <select [(ngModel)]="userDirection" (change)="applyUserFilters()">
+            <option value="asc">Crescente</option>
+            <option value="desc">Decrescente</option>
+          </select>
+        </label>
+      </div>
+    </div>
+
+    <p *ngIf="userLoading" class="status-message">Caricamento utenti...</p>
+    <p *ngIf="userErrorMessage" class="status-message error">{{ userErrorMessage }}</p>
+    <p *ngIf="userSuccessMessage" class="status-message success">{{ userSuccessMessage }}</p>
+
+    <div class="table-wrap" *ngIf="!userLoading && !userErrorMessage">
+      <table class="orders-table users-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Cognome</th>
+            <th>Email</th>
+            <th>Ruolo</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of visibleUsers">
+            <td>#{{ user.id }}</td>
+            <td>{{ user.nome }}</td>
+            <td>{{ user.cognome }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.ruolo }}</td>
+            <td>
+              <div class="row-actions">
+                <button type="button" class="danger-button" (click)="deleteUser(user)" [disabled]="isProtectedUser(user)">
+                  Elimina
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="empty-state" *ngIf="!userLoading && !userErrorMessage && visibleUsers.length === 0">
+      Nessun utente trovato.
     </div>
   </section>
 </section>

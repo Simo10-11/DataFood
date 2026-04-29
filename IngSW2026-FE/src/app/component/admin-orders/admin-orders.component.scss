@@ -116,6 +116,10 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.user-filters {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .product-form-card {
   border-radius: 0.9rem;
   padding: 1rem;
@@ -199,6 +203,11 @@
   color: #fff;
 }
 
+.danger-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 .row-actions {
   display: flex;
   gap: 0.5rem;
@@ -211,6 +220,10 @@
 
 .categories-table td:last-child {
   min-width: 170px;
+}
+
+.users-table td:last-child {
+  min-width: 130px;
 }
 
 .category-form-grid {
@@ -257,6 +270,13 @@
   font-size: 0.84rem;
   font-weight: 700;
   margin-bottom: 0.55rem;
+}
+
+.empty-state {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 0.8rem;
+  background: #f3f7f4;
 }
 
 .status-processing {
@@ -307,6 +327,10 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .user-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .product-form-grid {
     grid-template-columns: 1fr;
   }
@@ -323,7 +347,17 @@
     align-items: flex-start;
   }
 
+  .admin-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
   .filters-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .user-filters {
     grid-template-columns: 1fr;
   }
 

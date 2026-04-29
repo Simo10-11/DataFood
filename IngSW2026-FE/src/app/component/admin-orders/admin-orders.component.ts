@@ -6,10 +6,13 @@ import { Order, OrderStatusOption } from '../../dto/order.model';
 import { OrderService, OrderPageResponse } from '../../service/order.service';
 import { ProductService } from '../../service/product.service';
 import { CategoriaService } from '../../service/categoria.service';
+import { UtenteService } from '../../service/utente.service';
+import { AuthService } from '../../service/auth.service';
 import { Categoria } from '../../dto/categoria.model';
 import { Prodotto } from '../../dto/prodotto.model';
+import { Utente } from '../../dto/utente.model';
 
-type AdminSection = 'orders' | 'products' | 'categories';
+type AdminSection = 'orders' | 'products' | 'categories' | 'users';
 
 interface ProductFormModel {
   id?: number;
@@ -25,6 +28,14 @@ interface CategoryFormModel {
   id?: number;
   nome: string;
   descrizione: string;
+}
+
+interface UserViewModel {
+  id: number;
+  nome: string;
+  cognome: string;
+  email: string;
+  ruolo: string;
 }
 
 @Component({
@@ -60,6 +71,15 @@ export class AdminOrdersComponent implements OnInit {
   categoryDirection: 'asc' | 'desc' = 'asc';
   categoryForm: CategoryFormModel = this.emptyCategoryForm();
 
+  users: UserViewModel[] = [];
+  userLoading = false;
+  userErrorMessage = '';
+  userSuccessMessage = '';
+  userSearchText = '';
+  userRoleFilter = 'all';
+  userSortBy = 'nome';
+  userDirection: 'asc' | 'desc' = 'asc';
+
   page = 0;
   size = 10;
   totalPages = 0;
@@ -86,17 +106,24 @@ export class AdminOrdersComponent implements OnInit {
   constructor(
     private orderService: OrderService,
     private productService: ProductService,
-    private categoriaService: CategoriaService
+    private categoriaService: CategoriaService,
+    private utenteService: UtenteService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
     this.loadOrders();
     this.loadProducts();
     this.loadCategories();
+    this.loadUsers();
   }
 
   switchSection(section: AdminSection): void {
     this.activeSection = section;
+  }
+
+  get currentUserId(): number | undefined {
+    return this.authService.getCurrentUser()?.id;
   }
 
   loadOrders(): void {
@@ -241,6 +268,127 @@ export class AdminOrdersComponent implements OnInit {
         this.categoryErrorMessage = 'Impossibile caricare le categorie.';
       }
     });
+  }
+
+  loadUsers(): void {
+    this.userLoading = true;
+    this.userErrorMessage = '';
+
+    this.utenteService.getAllAdmin().subscribe({
+      next: (items) => {
+        this.users = (items ?? []).map((user) => this.normalizeUser(user));
+        this.userLoading = false;
+      },
+      error: (errorResponse) => {
+        this.userLoading = false;
+
+        if (errorResponse?.status === 403) {
+          this.userErrorMessage = 'Non sei autorizzato a visualizzare gli utenti admin.';
+          return;
+        }
+
+        this.userErrorMessage = 'Impossibile caricare gli utenti.';
+      }
+    });
+  }
+
+  get visibleUsers(): UserViewModel[] {
+    const normalizedSearch = this.userSearchText.trim().toLowerCase();
+    const selectedRole = this.userRoleFilter;
+
+    const sorted = [...this.users]
+      .filter((user) => {
+        if (!normalizedSearch) {
+          return true;
+        }
+
+        return user.nome.toLowerCase().includes(normalizedSearch)
+          || user.cognome.toLowerCase().includes(normalizedSearch)
+          || user.email.toLowerCase().includes(normalizedSearch);
+      })
+      .filter((user) => {
+        if (selectedRole === 'all') {
+          return true;
+        }
+
+        return user.ruolo === selectedRole;
+      })
+      .sort((left, right) => {
+        let comparison = 0;
+
+        switch (this.userSortBy) {
+          case 'email':
+            comparison = left.email.localeCompare(right.email);
+            break;
+          case 'ruolo':
+            comparison = left.ruolo.localeCompare(right.ruolo);
+            break;
+          default:
+            comparison = `${left.nome} ${left.cognome}`.localeCompare(`${right.nome} ${right.cognome}`);
+            break;
+        }
+
+        return this.userDirection === 'desc' ? -comparison : comparison;
+      });
+
+    return sorted;
+  }
+
+  applyUserFilters(): void {
+    // Filtri locali per mantenere la UI fluida e coerente.
+  }
+
+  deleteUser(user: UserViewModel): void {
+    if (!user.id) {
+      return;
+    }
+
+    if (this.currentUserId === user.id) {
+      this.userErrorMessage = 'Non puoi eliminare il tuo account mentre sei loggato.';
+      return;
+    }
+
+    const confirmed = window.confirm(`Eliminare l'utente ${user.nome} ${user.cognome}?`);
+    if (!confirmed) {
+      return;
+    }
+
+    this.userErrorMessage = '';
+    this.userSuccessMessage = '';
+
+    this.utenteService.deleteUser(user.id).subscribe({
+      next: () => {
+        this.userSuccessMessage = 'Utente eliminato con successo.';
+        this.loadUsers();
+      },
+      error: (errorResponse) => {
+        if (errorResponse?.status === 403) {
+          this.userErrorMessage = 'Non sei autorizzato a eliminare questo utente.';
+          return;
+        }
+
+        if (errorResponse?.status === 409) {
+          this.userErrorMessage = 'Utente collegato a dati relazionali: eliminazione bloccata.';
+          return;
+        }
+
+        if (errorResponse?.status === 400) {
+          this.userErrorMessage = 'Non puoi eliminare il tuo account o un amministratore.';
+          return;
+        }
+
+        if (errorResponse?.status === 404) {
+          this.userErrorMessage = 'Utente non trovato.';
+          return;
+        }
+
+        this.userErrorMessage = 'Impossibile eliminare l\'utente.';
+      }
+    });
+  }
+
+  isProtectedUser(user: UserViewModel): boolean {
+    return this.currentUserId === user.id || user.ruolo.toLowerCase() === 'admin';
   }
 
   get visibleCategories(): Categoria[] {
@@ -580,6 +728,16 @@ export class AdminOrdersComponent implements OnInit {
       imageUrl: product.imageUrl ?? null,
       idCategoria: Number(product.idCategoria),
       nomeCategoria: product.nomeCategoria ?? this.getCategoryName(product.idCategoria)
+    };
+  }
+
+  private normalizeUser(user: Utente): UserViewModel {
+    return {
+      id: Number(user.id),
+      nome: user.nome ?? '',
+      cognome: user.cognome ?? '',
+      email: user.email ?? '',
+      ruolo: (user.ruolo ?? 'cliente').toLowerCase()
     };
   }
 }

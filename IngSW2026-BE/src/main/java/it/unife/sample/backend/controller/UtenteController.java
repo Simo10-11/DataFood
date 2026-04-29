@@ -7,9 +7,14 @@ import it.unife.sample.backend.service.UtenteService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 public class UtenteController {
@@ -57,6 +62,37 @@ public class UtenteController {
 		try {
 			// Ripristino la sessione lato server usando l utente salvato nel browser
 			return ResponseEntity.ok(utenteService.restoreSession(request.userId(), session));
+		} catch (IllegalArgumentException exception) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+		}
+	}
+
+	@GetMapping({"/api/users", "/users"})
+	public ResponseEntity<List<UtenteDTO>> getAllUsers(HttpSession session) {
+		try {
+			return ResponseEntity.ok(utenteService.findAllUsers(session));
+		} catch (IllegalStateException exception) {
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+		}
+	}
+
+	@DeleteMapping({"/api/users/{id}", "/users/{id}"})
+	public ResponseEntity<Void> deleteUser(@PathVariable Long id, HttpSession session) {
+		try {
+			utenteService.deleteUser(id, session);
+			return ResponseEntity.noContent().build();
+		} catch (IllegalStateException exception) {
+			String message = exception.getMessage();
+			if (message != null && message.toLowerCase().contains("collegato")) {
+				return ResponseEntity.status(HttpStatus.CONFLICT).build();
+			}
+			if (message != null && message.toLowerCase().contains("eliminare il tuo account")) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+			}
+			if (message != null && message.toLowerCase().contains("amministratore")) {
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			}
+			return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
 		} catch (IllegalArgumentException exception) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}

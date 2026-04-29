@@ -6,13 +6,18 @@ import it.unife.sample.backend.dto.UtenteDTO;
 import it.unife.sample.backend.mapper.UtenteMapper;
 import it.unife.sample.backend.model.Utente;
 import it.unife.sample.backend.repository.UtenteRepository;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UtenteService {
 
 	private final UtenteRepository utenteRepository;
 	private final UtenteMapper utenteMapper;
+	private static final String LOGGED_USER_ID_SESSION_ATTRIBUTE = "loggedUserId";
 
 	public UtenteService(UtenteRepository utenteRepository, UtenteMapper utenteMapper) {
 		this.utenteRepository = utenteRepository;
@@ -72,6 +77,65 @@ public class UtenteService {
 		session.setAttribute("loggedUserRole", utente.getRuolo());
 
 		return utenteMapper.toDTO(utente);
+	}
+
+	public List<UtenteDTO> findAllUsers(HttpSession session) {
+		requireAdmin(session);
+		return utenteRepository.findAll().stream()
+				.map(utenteMapper::toDTO)
+				.toList();
+	}
+
+	public void deleteUser(Long userId, HttpSession session) {
+		requireAdmin(session);
+
+		if (userId == null || userId <= 0) {
+			throw new IllegalArgumentException("Utente non trovato");
+		}
+
+		Utente currentUser = getLoggedUser(session);
+		if (currentUser.getId().equals(userId)) {
+			throw new IllegalStateException("Non puoi eliminare il tuo account");
+		}
+
+		Utente target = utenteRepository.findById(userId)
+				.orElseThrow(() -> new IllegalArgumentException("Utente non trovato"));
+
+		if (target.getRuolo() != null && "admin".equalsIgnoreCase(target.getRuolo())) {
+			throw new IllegalStateException("Non puoi eliminare un amministratore");
+		}
+
+		try {
+			utenteRepository.deleteById(userId);
+		} catch (DataIntegrityViolationException exception) {
+			throw new IllegalStateException("Utente collegato a dati relazionali");
+		}
+	}
+
+	private void requireAdmin(HttpSession session) {
+		Utente utente = getLoggedUser(session);
+		if (utente.getRuolo() == null || !"admin".equalsIgnoreCase(utente.getRuolo())) {
+			throw new IllegalStateException("Utente non autorizzato");
+		}
+	}
+
+	private Utente getLoggedUser(HttpSession session) {
+		Object userIdObj = session.getAttribute(LOGGED_USER_ID_SESSION_ATTRIBUTE);
+		if (userIdObj == null) {
+			throw new IllegalStateException("Utente non autenticato");
+		}
+
+		Long userId;
+		if (userIdObj instanceof Long longValue) {
+			userId = longValue;
+		} else if (userIdObj instanceof Integer intValue) {
+			userId = intValue.longValue();
+		} else {
+			throw new IllegalStateException("Utente non autenticato");
+		}
+
+		return utenteRepository.findById(userId)
+				.orElseThrow(() -> new IllegalStateException("Utente non autenticato"));
 	}
 }
 
