@@ -1,12 +1,138 @@
-<div class="register-page">
-  <div class="register-container">
-    <p *ngIf="successMessage" class="feedback success">{{ successMessage }}</p>
-    <p *ngIf="errorMessage" class="feedback error">{{ errorMessage }}</p>
+<section class="register-page" aria-labelledby="datafood-register-title">
+  <main class="register-shell">
+    <article class="register-card">
+      <header class="brand-header">
+        <p class="brand-kicker">Crea il tuo profilo</p>
+        <h1 id="datafood-register-title">DataFood</h1>
+      </header>
 
-    <input type="email" [(ngModel)]="email" placeholder="Email">
-    <input type="password" [(ngModel)]="password" placeholder="Password">
-    <input type="text" [(ngModel)]="nome" placeholder="Nome">
-    <input type="text" [(ngModel)]="cognome" placeholder="Cognome">
-    <button (click)="register()">REGISTRATI</button>
-  </div>
-</div>
+      <!-- Form registrazione con validazione base lato client, senza cambiare la logica backend -->
+      <form #registerForm="ngForm" (ngSubmit)="onSubmit(registerForm)" novalidate>
+        <div class="field">
+          <label for="nome">Nome</label>
+          <div class="input-wrap">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M12 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 12c4.42 0 8 2.24 8 5v1a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-1c0-2.76 3.58-5 8-5Z" />
+              </svg>
+            </span>
+            <input
+              id="nome"
+              name="nome"
+              type="text"
+              [(ngModel)]="nome"
+              #nomeModel="ngModel"
+              required
+              autocomplete="given-name"
+              placeholder=" "
+              [attr.aria-invalid]="nomeModel.invalid && (nomeModel.dirty || nomeModel.touched)"
+            />
+          </div>
+          <p class="field-error" *ngIf="nomeModel.invalid && (nomeModel.dirty || nomeModel.touched)">
+            Inserisci il nome.
+          </p>
+        </div>
+
+        <div class="field">
+          <label for="cognome">Cognome</label>
+          <div class="input-wrap">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M12 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 12c4.42 0 8 2.24 8 5v1a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-1c0-2.76 3.58-5 8-5Z" />
+              </svg>
+            </span>
+            <input
+              id="cognome"
+              name="cognome"
+              type="text"
+              [(ngModel)]="cognome"
+              #cognomeModel="ngModel"
+              required
+              autocomplete="family-name"
+              placeholder=" "
+              [attr.aria-invalid]="cognomeModel.invalid && (cognomeModel.dirty || cognomeModel.touched)"
+            />
+          </div>
+          <p class="field-error" *ngIf="cognomeModel.invalid && (cognomeModel.dirty || cognomeModel.touched)">
+            Inserisci il cognome.
+          </p>
+        </div>
+
+        <div class="field">
+          <label for="email">Email</label>
+          <div class="input-wrap">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Zm0 2v.2L12 13l8-4.8V8H4Z" />
+              </svg>
+            </span>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              [(ngModel)]="email"
+              #emailModel="ngModel"
+              required
+              email
+              autocomplete="email"
+              placeholder=" "
+              [attr.aria-invalid]="emailModel.invalid && (emailModel.dirty || emailModel.touched)"
+            />
+          </div>
+          <p class="field-error" *ngIf="emailModel.invalid && (emailModel.dirty || emailModel.touched)">
+            Inserisci un indirizzo email valido.
+          </p>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M12 2a5 5 0 0 1 5 5v2h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2h1V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v2h6V7a3 3 0 0 0-3-3Z" />
+              </svg>
+            </span>
+            <input
+              id="password"
+              name="password"
+              [type]="showPassword ? 'text' : 'password'"
+              [(ngModel)]="password"
+              #passwordModel="ngModel"
+              required
+              autocomplete="new-password"
+              placeholder=" "
+              [attr.aria-invalid]="passwordModel.invalid && (passwordModel.dirty || passwordModel.touched)"
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              (click)="showPassword = !showPassword"
+              [attr.aria-label]="showPassword ? 'Nascondi password' : 'Mostra password'"
+              [attr.aria-pressed]="showPassword"
+            >
+              {{ showPassword ? 'Nascondi' : 'Mostra' }}
+            </button>
+          </div>
+          <p class="field-error" *ngIf="passwordModel.invalid && (passwordModel.dirty || passwordModel.touched)">
+            Inserisci la password.
+          </p>
+        </div>
+
+        <p *ngIf="successMessage" class="feedback success" role="status">{{ successMessage }}</p>
+        <p *ngIf="errorMessage" class="feedback error" role="alert">{{ errorMessage }}</p>
+
+        <button type="submit" class="register-btn" [disabled]="isLoading || registerForm.invalid">
+          <span class="spinner" *ngIf="isLoading" aria-hidden="true"></span>
+          <span>{{ isLoading ? 'Registrazione in corso...' : 'Registrati' }}</span>
+        </button>
+      </form>
+
+      <footer class="auth-footer">
+        <p>
+          Hai gia un account?
+          <a routerLink="/login" class="text-link strong-link">Accedi</a>
+        </p>
+      </footer>
+    </article>
+  </main>
+</section>

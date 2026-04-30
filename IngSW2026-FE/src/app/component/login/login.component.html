@@ -46,7 +46,7 @@
             <input
               id="password"
               name="password"
-              type="password"
+              [type]="showPassword ? 'text' : 'password'"
               [(ngModel)]="password"
               #passwordModel="ngModel"
               required
@@ -54,20 +54,22 @@
               placeholder=" "
               [attr.aria-invalid]="passwordModel.invalid && (passwordModel.dirty || passwordModel.touched)"
             />
+           
+            <button
+              type="button"
+              class="password-toggle"
+              (click)="showPassword = !showPassword"
+              [attr.aria-label]="showPassword ? 'Nascondi password' : 'Mostra password'"
+              [attr.aria-pressed]="showPassword"
+            >
+              {{ showPassword ? 'Nascondi' : 'Mostra' }}
+            </button>
           </div>
           <p class="field-error" *ngIf="passwordModel.invalid && (passwordModel.dirty || passwordModel.touched)">
             Inserisci la password.
           </p>
         </div>
 
-        <div class="form-options">
-          <label class="remember-me" for="rememberMe">
-            <input id="rememberMe" name="rememberMe" type="checkbox" [(ngModel)]="rememberMe" />
-            <span>Ricordami</span>
-          </label>
-        </div>
-
-        <p class="form-feedback error" role="alert" *ngIf="errorMessage">{{ errorMessage }}</p>
 
         <button type="submit" class="login-btn" [disabled]="isLoading || loginForm.invalid">
           <span class="spinner" *ngIf="isLoading" aria-hidden="true"></span>
