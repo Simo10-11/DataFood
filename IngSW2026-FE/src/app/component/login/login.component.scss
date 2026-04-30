@@ -182,12 +182,13 @@ form {
   border-radius: 10px;
   padding: 0.62rem 0.75rem;
   font-size: 0.86rem;
+  line-height: 1.35;
 }
 
 .form-feedback.error {
   color: var(--df-danger);
-  background: #fff1f1;
-  border: 1px solid #ffc5c5;
+  background: rgba(180, 35, 24, 0.08);
+  border: 1px solid rgba(180, 35, 24, 0.22);
 }
 
 .form-feedback.info {

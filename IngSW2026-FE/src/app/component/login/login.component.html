@@ -9,6 +9,10 @@
 
       <!-- Form di login: usiamo validazione base Angular senza toccare la logica backend -->
       <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)" novalidate>
+        <p class="form-feedback error" *ngIf="errorMessage" role="alert" aria-live="polite">
+          {{ errorMessage }}
+        </p>
+
         <div class="field" [class.is-filled]="email">
           <label for="email">Email</label>
           <div class="input-wrap">

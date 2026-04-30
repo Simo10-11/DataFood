@@ -1,5 +1,6 @@
 <header class="navbar">
   <div class="navbar-row">
+    <!-- Brand e identita del negozio -->
     <div class="brand" aria-label="DataFood home">
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         <path d="M19.8 4.2C15 3.4 12.4 6 11.1 8.3c-1.4 2.5-1.5 5.4-1.5 6.8V20h2.2v-3.8c1.5-.1 4.7-.6 7-2.7 2.2-2.1 3-5.4 2.4-9.5-.1-.3-.2-.6-.6-.6-.3 0-.6.1-.8.2z" fill="currentColor"/>
@@ -7,8 +8,13 @@
       <span>DataFood</span>
     </div>
 
+    <!-- Ricerca centrale -->
     <div class="search-wrap">
-      <span class="search-icon" aria-hidden="true">🔍</span>
+      <span class="search-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path d="M10 4a6 6 0 1 1 3.87 10.59l4.27 4.27-1.41 1.41-4.27-4.27A6 6 0 0 1 10 4m0 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8" fill="currentColor"/>
+        </svg>
+      </span>
       <input
         type="text"
         class="search"
@@ -18,36 +24,166 @@
       />
     </div>
 
-    <div class="actions">
-      <button *ngIf="currentUser" class="login-button" type="button" routerLink="/cart">Carrello</button>
-      <button *ngIf="!currentUser" class="login-button" type="button" routerLink="/login">LOGIN</button>
-      <button *ngIf="!currentUser" class="login-button" type="button" routerLink="/register">REGISTER</button>
-      <ng-container *ngIf="currentUser as user">
-        <div class="user-greeting" aria-label="Utente loggato">
-          Ciao {{ user.nome }}
-        </div>
+    <!-- Azioni desktop -->
+    <div class="desktop-actions" *ngIf="currentUser as user; else guestActions">
+      <div class="quick-links" aria-label="Azioni rapide">
+        <a class="cart-button" routerLink="/cart" aria-label="Apri carrello" title="Carrello">
+          <span class="action-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4m10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4M6.2 6l.4 2h12.8a1 1 0 0 1 1 .8l-1.2 5.2a2 2 0 0 1-2 1.5H8.1a2 2 0 0 1-2-1.6L4.3 4H2V2h3.1a1 1 0 0 1 1 .8L6.4 6z" fill="currentColor"/>
+            </svg>
+          </span>
+          <span>Carrello</span>
+          <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
+        </a>
 
-        <button *ngIf="user.ruolo === 'admin'" class="login-button" type="button" routerLink="/admin/orders">Admin panel</button>
-        <button class="login-button" type="button" routerLink="/orders">I miei ordini</button>
-        <button class="login-button" type="button" routerLink="/wishlist">Wishlist</button>
+        <a class="wishlist-button" routerLink="/wishlist" aria-label="Apri wish list" title="Wish List">
+          <span class="action-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M12 21s-6.7-4.35-9.33-7.8C.8 10.4 1.5 6.8 4.3 5a5 5 0 0 1 6.1.63A5 5 0 0 1 16.5 5C19.3 6.8 20 10.4 21.33 13.2 18.7 16.65 12 21 12 21z" fill="currentColor"/>
+            </svg>
+          </span>
+          <span>Wish List</span>
+        </a>
+      </div>
 
-        <button
-          *ngIf="!logoutConfirmationVisible"
-          class="logout-button"
-          type="button"
-          (click)="requestLogout()"
-        >
-          Logout
+      <div class="account-area">
+        <button class="user-trigger" type="button" (click)="toggleUserMenu()" [attr.aria-expanded]="userMenuOpen" aria-haspopup="true">
+          <span class="action-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4m0 2c-3.33 0-6 1.67-6 4v2h12v-2c0-2.33-2.67-4-6-4z" fill="currentColor"/>
+            </svg>
+          </span>
+          <span class="user-trigger-copy">
+            <span class="user-label">Ciao</span>
+            <span class="user-name">{{ user.nome }}</span>
+          </span>
+          <span class="chevron" [class.chevron-open]="userMenuOpen" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false">
+              <path d="M7.41 8.59 12 13.17l4.59-4.58L18 10l-6 6-6-6z" fill="currentColor"/>
+            </svg>
+          </span>
         </button>
 
-        <div *ngIf="logoutConfirmationVisible" class="logout-confirmation" role="status" aria-live="polite">
-          <span>Confermi il logout?</span>
-          <div class="logout-confirmation-actions">
-            <button class="logout-cancel-button" type="button" (click)="cancelLogout()">Annulla</button>
-            <button class="logout-confirm-button" type="button" (click)="confirmLogout()">Esci</button>
+        <div class="user-menu" *ngIf="userMenuOpen" role="menu" aria-label="Menu utente">
+          <div class="user-menu-header">
+            <strong>{{ user.nome }} {{ user.cognome }}</strong>
+            <span>Accesso rapido al tuo account</span>
+          </div>
+
+          <a *ngIf="user.ruolo === 'admin'" class="user-menu-item" routerLink="/admin/orders" (click)="closeMenus()" role="menuitem">
+            <span class="action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M7 4h10v2H7zm0 14h10v2H7zM5 8h14v8H5zm2 2v4h10v-4z" fill="currentColor"/>
+              </svg>
+            </span>
+            <span>Admin panel</span>
+          </a>
+
+          <a class="user-menu-item" routerLink="/orders" (click)="closeMenus()" role="menuitem">
+            <span class="action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M6 2h12a1 1 0 0 1 1 1v18l-4-2-4 2-4-2-4 2V3a1 1 0 0 1 1-1m1 3v14.38l3-1.5 4 1.5 3-1.5V5z" fill="currentColor"/>
+              </svg>
+            </span>
+            <span>I miei ordini</span>
+          </a>
+
+          <button class="user-menu-item danger" type="button" (click)="requestLogout()" role="menuitem">
+            <span class="action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M16 13v-2H9V8l-5 4 5 4v-3zm2-10H8a2 2 0 0 0-2 2v3h2V5h10v14H8v-3H6v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2z" fill="currentColor"/>
+              </svg>
+            </span>
+            <span>Logout</span>
+          </button>
+
+          <div *ngIf="logoutConfirmationVisible" class="logout-confirmation" role="status" aria-live="polite">
+            <span>Confermi il logout?</span>
+            <div class="logout-confirmation-actions">
+              <button class="logout-cancel-button" type="button" (click)="cancelLogout()">Annulla</button>
+              <button class="logout-confirm-button" type="button" (click)="confirmLogout()">Esci</button>
+            </div>
           </div>
         </div>
-      </ng-container>
+      </div>
     </div>
+
+    <!-- Azioni mobile -->
+    <div class="mobile-actions" *ngIf="currentUser">
+      <a class="cart-button cart-button-mobile" routerLink="/cart" aria-label="Apri carrello" title="Carrello">
+        <span class="action-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M7 18a2 2 0 1 0 0 4 2 2 0 0 0 0-4m10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4M6.2 6l.4 2h12.8a1 1 0 0 1 1 .8l-1.2 5.2a2 2 0 0 1-2 1.5H8.1a2 2 0 0 1-2-1.6L4.3 4H2V2h3.1a1 1 0 0 1 1 .8L6.4 6z" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="cart-badge" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
+      </a>
+
+      <a class="wishlist-button wishlist-button-mobile" routerLink="/wishlist" aria-label="Apri wish list" title="Wish List">
+        <span class="action-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <path d="M12 21s-6.7-4.35-9.33-7.8C.8 10.4 1.5 6.8 4.3 5a5 5 0 0 1 6.1.63A5 5 0 0 1 16.5 5C19.3 6.8 20 10.4 21.33 13.2 18.7 16.65 12 21 12 21z" fill="currentColor"/>
+          </svg>
+        </span>
+      </a>
+
+      <button class="menu-toggle" type="button" (click)="toggleMobileMenu()" [attr.aria-expanded]="mobileMenuOpen" aria-label="Apri menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+
+    <ng-template #guestActions>
+      <div class="desktop-actions guest-actions">
+        <a class="ghost-button" routerLink="/login">Login</a>
+        <a class="solid-button" routerLink="/register">Registrati</a>
+      </div>
+
+      <div class="mobile-actions guest-mobile-actions">
+        <button class="menu-toggle" type="button" (click)="toggleMobileMenu()" [attr.aria-expanded]="mobileMenuOpen" aria-label="Apri menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </ng-template>
+  </div>
+
+  <div class="mobile-menu" *ngIf="mobileMenuOpen">
+    <div class="mobile-menu-section" *ngIf="currentUser as user; else mobileGuestMenu">
+      <div class="mobile-user-card">
+        <span class="mobile-user-kicker">Ciao</span>
+        <strong>{{ user.nome }} {{ user.cognome }}</strong>
+      </div>
+
+      <a *ngIf="user.ruolo === 'admin'" class="mobile-menu-item" routerLink="/admin/orders" (click)="closeMenus()">
+        <span>Admin panel</span>
+      </a>
+      <a class="mobile-menu-item" routerLink="/orders" (click)="closeMenus()">
+        <span>I miei ordini</span>
+      </a>
+      <button class="mobile-menu-item danger" type="button" (click)="requestLogout()">
+        <span>Logout</span>
+      </button>
+
+      <div *ngIf="logoutConfirmationVisible" class="logout-confirmation mobile-logout-confirmation" role="status" aria-live="polite">
+        <span>Confermi il logout?</span>
+        <div class="logout-confirmation-actions">
+          <button class="logout-cancel-button" type="button" (click)="cancelLogout()">Annulla</button>
+          <button class="logout-confirm-button" type="button" (click)="confirmLogout()">Esci</button>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #mobileGuestMenu>
+      <a class="mobile-menu-item" routerLink="/login" (click)="closeMenus()">
+        <span>Login</span>
+      </a>
+      <a class="mobile-menu-item" routerLink="/register" (click)="closeMenus()">
+        <span>Registrati</span>
+      </a>
+    </ng-template>
   </div>
 </header>
