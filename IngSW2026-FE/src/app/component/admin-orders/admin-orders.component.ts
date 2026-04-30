@@ -367,11 +367,6 @@ export class AdminOrdersComponent implements OnInit {
           return;
         }
 
-        if (errorResponse?.status === 409) {
-          this.userErrorMessage = 'Utente collegato a dati relazionali: eliminazione bloccata.';
-          return;
-        }
-
         if (errorResponse?.status === 400) {
           this.userErrorMessage = 'Non puoi eliminare il tuo account o un amministratore.';
           return;

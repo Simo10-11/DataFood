@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface OrdineRepository extends JpaRepository<Ordine, Long> {
     List<Ordine> findByUtenteId(Long userId);
+
+    void deleteByUtenteId(Long userId);
 }

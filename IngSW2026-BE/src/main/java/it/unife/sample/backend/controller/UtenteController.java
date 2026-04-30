@@ -83,9 +83,6 @@ public class UtenteController {
 			return ResponseEntity.noContent().build();
 		} catch (IllegalStateException exception) {
 			String message = exception.getMessage();
-			if (message != null && message.toLowerCase().contains("collegato")) {
-				return ResponseEntity.status(HttpStatus.CONFLICT).build();
-			}
 			if (message != null && message.toLowerCase().contains("eliminare il tuo account")) {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 			}

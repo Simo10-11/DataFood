@@ -5,10 +5,12 @@ import it.unife.sample.backend.dto.RegisterRequestDTO;
 import it.unife.sample.backend.dto.UtenteDTO;
 import it.unife.sample.backend.mapper.UtenteMapper;
 import it.unife.sample.backend.model.Utente;
+import it.unife.sample.backend.repository.OrdineRepository;
 import it.unife.sample.backend.repository.UtenteRepository;
+import it.unife.sample.backend.repository.WishlistRepository;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,11 +19,20 @@ public class UtenteService {
 
 	private final UtenteRepository utenteRepository;
 	private final UtenteMapper utenteMapper;
+	private final OrdineRepository ordineRepository;
+	private final WishlistRepository wishlistRepository;
 	private static final String LOGGED_USER_ID_SESSION_ATTRIBUTE = "loggedUserId";
 
-	public UtenteService(UtenteRepository utenteRepository, UtenteMapper utenteMapper) {
+	public UtenteService(
+			UtenteRepository utenteRepository,
+			UtenteMapper utenteMapper,
+			OrdineRepository ordineRepository,
+			WishlistRepository wishlistRepository
+	) {
 		this.utenteRepository = utenteRepository;
 		this.utenteMapper = utenteMapper;
+		this.ordineRepository = ordineRepository;
+		this.wishlistRepository = wishlistRepository;
 	}
 
 	public UtenteDTO login(LoginRequestDTO request) {
@@ -86,6 +97,7 @@ public class UtenteService {
 				.toList();
 	}
 
+	@Transactional
 	public void deleteUser(Long userId, HttpSession session) {
 		requireAdmin(session);
 
@@ -105,11 +117,9 @@ public class UtenteService {
 			throw new IllegalStateException("Non puoi eliminare un amministratore");
 		}
 
-		try {
-			utenteRepository.deleteById(userId);
-		} catch (DataIntegrityViolationException exception) {
-			throw new IllegalStateException("Utente collegato a dati relazionali");
-		}
+		ordineRepository.deleteByUtenteId(userId);
+		wishlistRepository.deleteByUtente_Id(userId);
+		utenteRepository.deleteById(userId);
 	}
 
 	private void requireAdmin(HttpSession session) {

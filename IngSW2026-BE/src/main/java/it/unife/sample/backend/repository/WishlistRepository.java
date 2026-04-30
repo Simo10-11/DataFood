@@ -14,6 +14,8 @@ public interface WishlistRepository extends JpaRepository<Wishlist, Long> {
 
     List<Wishlist> findByUtente_Id(Long utenteId);
 
+    void deleteByUtente_Id(Long utenteId);
+
     @Query("""
             SELECT CASE WHEN COUNT(w) > 0 THEN true ELSE false END
             FROM Wishlist w
