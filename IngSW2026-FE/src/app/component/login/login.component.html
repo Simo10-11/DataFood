@@ -1,7 +1,86 @@
-<div class="login-page">
-  <div class="login-container">
-    <input type="email" [(ngModel)]="email" placeholder="Email">
-    <input type="password" [(ngModel)]="password" placeholder="Password">
-    <button (click)="login()">Login</button>
-  </div>
-</div>
+<section class="login-page" aria-labelledby="datafood-login-title">
+  <main class="auth-shell">
+    <article class="login-card">
+      <header class="brand-header">
+        <p class="brand-kicker">Benvenuto su</p>
+        <h1 id="datafood-login-title">DataFood</h1>
+        <p class="brand-subtitle">Accedi al tuo account per continuare.</p>
+      </header>
+
+      <!-- Form di login: usiamo validazione base Angular senza toccare la logica backend -->
+      <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)" novalidate>
+        <div class="field" [class.is-filled]="email">
+          <label for="email">Email</label>
+          <div class="input-wrap">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Zm0 2v.2L12 13l8-4.8V8H4Z" />
+              </svg>
+            </span>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              [(ngModel)]="email"
+              #emailModel="ngModel"
+              required
+              email
+              autocomplete="email"
+              placeholder=" "
+              [attr.aria-invalid]="emailModel.invalid && (emailModel.dirty || emailModel.touched)"
+            />
+          </div>
+          <p class="field-error" *ngIf="emailModel.invalid && (emailModel.dirty || emailModel.touched)">
+            Inserisci un indirizzo email valido.
+          </p>
+        </div>
+
+        <div class="field" [class.is-filled]="password">
+          <label for="password">Password</label>
+          <div class="input-wrap">
+            <span class="icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M12 2a5 5 0 0 1 5 5v2h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2h1V7a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v2h6V7a3 3 0 0 0-3-3Zm0 9a2 2 0 0 1 1 3.73V18h-2v-1.27A2 2 0 0 1 12 13Z" />
+              </svg>
+            </span>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              [(ngModel)]="password"
+              #passwordModel="ngModel"
+              required
+              autocomplete="current-password"
+              placeholder=" "
+              [attr.aria-invalid]="passwordModel.invalid && (passwordModel.dirty || passwordModel.touched)"
+            />
+          </div>
+          <p class="field-error" *ngIf="passwordModel.invalid && (passwordModel.dirty || passwordModel.touched)">
+            Inserisci la password.
+          </p>
+        </div>
+
+        <div class="form-options">
+          <label class="remember-me" for="rememberMe">
+            <input id="rememberMe" name="rememberMe" type="checkbox" [(ngModel)]="rememberMe" />
+            <span>Ricordami</span>
+          </label>
+        </div>
+
+        <p class="form-feedback error" role="alert" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+        <button type="submit" class="login-btn" [disabled]="isLoading || loginForm.invalid">
+          <span class="spinner" *ngIf="isLoading" aria-hidden="true"></span>
+          <span>{{ isLoading ? 'Accesso in corso...' : 'Accedi' }}</span>
+        </button>
+      </form>
+
+      <footer class="auth-footer">
+        <p>
+          Non hai un account?
+          <a routerLink="/register" class="text-link strong-link">Crea un account</a>
+        </p>
+      </footer>
+    </article>
+  </main>
+</section>
