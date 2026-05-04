@@ -1,6 +1,6 @@
 # DataFood 🍔
 
-Applicazione backend per la gestione e visualizzazione di prodotti alimentari (e-commerce) tramite API REST e database MySQL.
+Applicazione per la gestione e visualizzazione di prodotti alimentari (e-commerce) tramite API REST e database MySQL.
 
 ---
 
