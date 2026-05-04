@@ -4,15 +4,6 @@ Applicazione backend per la gestione e visualizzazione di prodotti alimentari (e
 
 ---
 
-## 🚀 Features
-
-* Connessione a database MySQL
-* API REST 
-* Recupero dati alimentari
-* Servizio backend semplice e scalabile
-* Frontend semplice ma efficace
-
----
 
 ## 🛠️ Tecnologie
 
