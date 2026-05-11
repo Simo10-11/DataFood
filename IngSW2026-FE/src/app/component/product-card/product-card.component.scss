@@ -20,16 +20,21 @@
   position: absolute;
   top: 0.6rem;
   right: 0.6rem;
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   border: 1px solid #d9e6d9;
-  border-radius: 8px;
+  border-radius: 10px;
   background: #ffffff;
   color: #b3b3b3;
   cursor: pointer;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
   transition: all 0.2s ease;
   z-index: 1;
+  overflow: visible;
 }
 
 .wishlist-button.active {
@@ -157,6 +162,14 @@ h4 {
 }
 
 @media (max-width: 560px) {
+  .wishlist-button {
+    top: 0.5rem;
+    right: 0.5rem;
+    width: 36px;
+    height: 36px;
+    font-size: 1.12rem;
+  }
+
   .product-image,
   .product-image-fallback {
     height: 138px;

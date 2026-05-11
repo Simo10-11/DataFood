@@ -10,7 +10,6 @@
     [class.active]="categoriaSelezionataId === undefined"
     (click)="resetFiltro()"
   >
-    <span class="category-emoji" aria-hidden="true">🧺</span>
     <span>Tutte</span>
   </button>
 
@@ -21,7 +20,6 @@
     [class.active]="(categoria.id ?? categoria.ID) === categoriaSelezionataId"
     (click)="selectCategoria(categoria)"
   >
-    <span class="category-emoji" aria-hidden="true">🥬</span>
     <span>{{ categoria.nome }}</span>
   </button>
 </aside>
