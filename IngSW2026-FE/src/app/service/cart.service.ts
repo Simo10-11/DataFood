@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { switchMap } from 'rxjs/operators';
 import { Cart } from '../dto/cart.model';
 
@@ -10,6 +11,7 @@ import { Cart } from '../dto/cart.model';
 export class CartService {
 
   private readonly apiUrl = '/api/cart';
+  cartUpdated$ = new Subject<void>();
 
   constructor(private http: HttpClient) {}
 
@@ -29,17 +31,23 @@ export class CartService {
       );
     }
 
-    return request$;
+    return request$.pipe(
+      tap(() => this.cartUpdated$.next())
+    );
   }
 
   removeFromCart(productId: number): Observable<Cart> {
-    return this.http.post<Cart>(`${this.apiUrl}/remove/${productId}`, {}, { withCredentials: true });
+    return this.http.post<Cart>(`${this.apiUrl}/remove/${productId}`, {}, { withCredentials: true }).pipe(
+      tap(() => this.cartUpdated$.next())
+    );
   }
 
   updateQuantity(productId: number, quantita: number): Observable<Cart> {
     return this.http.post<Cart>(`${this.apiUrl}/update`, {
       productId,
       quantita
-    }, { withCredentials: true });
+    }, { withCredentials: true }).pipe(
+      tap(() => this.cartUpdated$.next())
+    );
   }
 }

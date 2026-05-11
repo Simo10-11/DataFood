@@ -22,14 +22,14 @@ public class LeaderboardService {
 
     /**
      * Ottiene la leaderboard ordinata per punti totali
-     * Mostra solo utenti con punti > 0, top 100
+     * Mostra solo utenti con punti > 0, top 10
      */
     public LeaderboardDTO getLeaderboard() {
         List<Utente> topUtenti = utenteRepository.findAll()
             .stream()
             .filter(u -> u.getPuntiTotali() != null && u.getPuntiTotali() > 0)
             .sorted((u1, u2) -> u2.getPuntiTotali().compareTo(u1.getPuntiTotali()))
-            .limit(100)
+            .limit(10)
             .collect(Collectors.toList());
 
         List<LeaderboardEntryDTO> entries = topUtenti.stream()

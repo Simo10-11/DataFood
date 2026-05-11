@@ -28,7 +28,7 @@ export class LeaderboardService {
   constructor(private http: HttpClient) { }
 
   /**
-   * Ottiene la leaderboard giornaliera (top 100)
+   * Ottiene la leaderboard mensile (top 10)
    */
   getLeaderboard(): Observable<LeaderboardDTO> {
     return this.http.get<LeaderboardDTO>(this.apiUrl);

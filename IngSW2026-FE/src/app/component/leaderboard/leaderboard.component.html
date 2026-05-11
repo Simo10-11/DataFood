@@ -1,8 +1,9 @@
 <div class="leaderboard-container">
-  <div class="leaderboard-header">
+  <header class="leaderboard-header">
     <h1>🏆 Classifica Punti</h1>
-    <p class="subtitle">Top 100 utenti per punti totali accumulati</p>
-  </div>
+    <a routerLink="/" class="back-link">Torna al catalogo</a>
+  </header>
+  <p class="subtitle">Top 10 utenti per punti totali accumulati mensilmente</p>
 
   <div *ngIf="isLoading" class="loading">
     <p>Caricamento della classifica...</p>

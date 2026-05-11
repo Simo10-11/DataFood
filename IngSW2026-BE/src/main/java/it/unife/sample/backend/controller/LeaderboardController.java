@@ -24,7 +24,7 @@ public class LeaderboardController {
 
     /**
      * GET /api/leaderboard
-     * Restituisce la leaderboard giornaliera (top 100)
+     * Restituisce la leaderboard mensile (top 10)
      */
     @GetMapping
     public ResponseEntity<LeaderboardDTO> getLeaderboard() {

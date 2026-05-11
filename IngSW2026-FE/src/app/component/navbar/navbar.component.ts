@@ -6,6 +6,7 @@ import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../service/auth.service';
 import { CartService } from '../../service/cart.service';
+import { WishlistService } from '../../service/wishlist.service';
 import { LeaderboardService } from '../../service/leaderboard.service';
 import { Utente } from '../../dto/utente.model';
 
@@ -23,6 +24,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   userMenuOpen = false;
   mobileMenuOpen = false;
   cartItemCount = 0;
+  wishlistItemCount = 0;
   currentUser: Utente | null = null;
   userRank: number | null = null; // Posizione nella leaderboard
   // Flag UI locale: quando true mostriamo i pulsanti di conferma logout.
@@ -32,6 +34,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private cartService: CartService,
+    private wishlistService: WishlistService,
     private leaderboardService: LeaderboardService,
     private router: Router
   ) {}
@@ -40,6 +43,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.currentUser = this.authService.getCurrentUser();
     if (this.currentUser?.id) {
       this.loadUserRank(this.currentUser.id);
+      this.loadWishlistCount(this.currentUser.id);
+      this.loadCartCount();
     }
 
     this.subscriptions.add(
@@ -48,6 +53,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
         if (!user) {
           this.cartItemCount = 0;
+          this.wishlistItemCount = 0;
           this.userRank = null;
           this.userMenuOpen = false;
           this.mobileMenuOpen = false;
@@ -56,7 +62,26 @@ export class NavbarComponent implements OnInit, OnDestroy {
         }
 
         this.loadCartCount();
+        this.loadWishlistCount(user.id);
         this.loadUserRank(user.id);
+      })
+    );
+
+    // Sottoscrizione agli aggiornamenti del carrello
+    this.subscriptions.add(
+      this.cartService.cartUpdated$.subscribe(() => {
+        if (this.currentUser?.id) {
+          this.loadCartCount();
+        }
+      })
+    );
+
+    // Sottoscrizione agli aggiornamenti della wishlist
+    this.subscriptions.add(
+      this.wishlistService.wishlistUpdated$.subscribe(() => {
+        if (this.currentUser?.id) {
+          this.loadWishlistCount(this.currentUser.id);
+        }
       })
     );
   }
@@ -112,6 +137,19 @@ export class NavbarComponent implements OnInit, OnDestroy {
         },
         error: () => {
           this.cartItemCount = 0;
+        }
+      })
+    );
+  }
+
+  private loadWishlistCount(utenteId: number): void {
+    this.subscriptions.add(
+      this.wishlistService.getWishlistByUtente(utenteId).subscribe({
+        next: (wishlist) => {
+          this.wishlistItemCount = (wishlist ?? []).length;
+        },
+        error: () => {
+          this.wishlistItemCount = 0;
         }
       })
     );
