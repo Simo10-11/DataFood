@@ -15,9 +15,11 @@ public class PuntiService {
     private static final int VALORE_PUNTO_EURO = 1;
 
     private final UtenteRepository utenteRepository;
+    private final LeaderboardService leaderboardService;
 
-    public PuntiService(UtenteRepository utenteRepository) {
+    public PuntiService(UtenteRepository utenteRepository, LeaderboardService leaderboardService) {
         this.utenteRepository = utenteRepository;
+        this.leaderboardService = leaderboardService;
     }
 
     /**
@@ -34,6 +36,7 @@ public class PuntiService {
     /**
      * Aggiorna i punti dopo la conferma ordine
      * - Incrementa sia puntiTotali che puntiDisponibili
+     * - Incrementa puntiGiornalieri (per la leaderboard)
      * - Salva nel database
      */
     @Transactional
@@ -44,6 +47,7 @@ public class PuntiService {
 
         utente.setPuntiTotali(utente.getPuntiTotali() + puntiGuadagnati);
         utente.setPuntiDisponibili(utente.getPuntiDisponibili() + puntiGuadagnati);
+        utente.setPuntiGiornalieri(utente.getPuntiGiornalieri() + puntiGuadagnati);
 
         utenteRepository.save(utente);
     }

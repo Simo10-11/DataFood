@@ -11,4 +11,5 @@ public class UtenteDTO {
 	private String ruolo;
 	private Integer puntiTotali;
 	private Integer puntiDisponibili;
-}
+	private Integer puntiGiornalieri;
+	}

@@ -57,4 +57,7 @@ public class Utente {
 
 	@Column(name = "PUNTI_DISPONIBILI", nullable = false)
 	private Integer puntiDisponibili = 0;
+
+	@Column(name = "PUNTI_GIORNALIERI", nullable = false)
+	private Integer puntiGiornalieri = 0;
 }

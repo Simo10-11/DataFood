@@ -333,6 +333,40 @@
   color: var(--color-text-muted);
 }
 
+.rank-section {
+  margin: 0.75rem 0;
+  padding: 0.75rem 0.85rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(255, 193, 7, 0.08));
+  border: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+.rank-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.rank-icon {
+  font-size: 1.5rem;
+}
+
+.rank-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.rank-info strong {
+  font-size: 1.1rem;
+  color: #f57f17;
+}
+
+.rank-value {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
 .user-menu-item,
 .mobile-menu-item {
   width: 100%;

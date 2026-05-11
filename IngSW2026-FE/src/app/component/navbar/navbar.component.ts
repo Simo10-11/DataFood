@@ -6,6 +6,7 @@ import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../service/auth.service';
 import { CartService } from '../../service/cart.service';
+import { LeaderboardService } from '../../service/leaderboard.service';
 import { Utente } from '../../dto/utente.model';
 
 @Component({
@@ -23,6 +24,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   mobileMenuOpen = false;
   cartItemCount = 0;
   currentUser: Utente | null = null;
+  userRank: number | null = null; // Posizione nella leaderboard
   // Flag UI locale: quando true mostriamo i pulsanti di conferma logout.
   logoutConfirmationVisible = false;
   private readonly subscriptions = new Subscription();
@@ -30,11 +32,15 @@ export class NavbarComponent implements OnInit, OnDestroy {
   constructor(
     private authService: AuthService,
     private cartService: CartService,
+    private leaderboardService: LeaderboardService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
+    if (this.currentUser?.id) {
+      this.loadUserRank(this.currentUser.id);
+    }
 
     this.subscriptions.add(
       this.authService.currentUser$.subscribe((user) => {
@@ -42,6 +48,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
         if (!user) {
           this.cartItemCount = 0;
+          this.userRank = null;
           this.userMenuOpen = false;
           this.mobileMenuOpen = false;
           this.logoutConfirmationVisible = false;
@@ -49,6 +56,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
         }
 
         this.loadCartCount();
+        this.loadUserRank(user.id);
       })
     );
   }
@@ -104,6 +112,20 @@ export class NavbarComponent implements OnInit, OnDestroy {
         },
         error: () => {
           this.cartItemCount = 0;
+        }
+      })
+    );
+  }
+
+  private loadUserRank(utenteId: number): void {
+    this.subscriptions.add(
+      this.leaderboardService.getUserRank(utenteId).subscribe({
+        next: (data) => {
+          this.userRank = data.rank;
+        },
+        error: (err) => {
+          console.warn('Errore nel caricamento del rank:', err);
+          this.userRank = null;
         }
       })
     );
