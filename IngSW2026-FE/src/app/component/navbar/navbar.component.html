@@ -81,12 +81,12 @@
             </div>
           </div>
 
-          <div class="rank-section" *ngIf="userRank !== null">
+          <div class="rank-section" *ngIf="userRank !== null && userRank > 0">
             <div class="rank-badge">
               <span class="rank-icon">🏆</span>
               <div class="rank-info">
                 <strong>#{{ userRank }}</strong> in classifica
-                <span class="rank-value">Leaderboard giornaliera</span>
+                <span class="rank-value">Classifica</span>
               </div>
             </div>
           </div>
