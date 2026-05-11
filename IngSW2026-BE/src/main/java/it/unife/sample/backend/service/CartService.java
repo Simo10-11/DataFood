@@ -17,6 +17,7 @@ import java.util.Optional;
 public class CartService {
 
     private static final String CART_SESSION_ATTRIBUTE = "cart";
+    private static final String LOGGED_USER_ID_SESSION_ATTRIBUTE = "loggedUserId";
 
     private final ProdottoRepository prodottoRepository;
 
@@ -80,12 +81,26 @@ public class CartService {
     }
 
     private Cart getOrCreateCart(HttpSession session) {
-        Cart cart = (Cart) session.getAttribute(CART_SESSION_ATTRIBUTE);
+        String cartSessionAttribute = getCartSessionAttribute(session);
+        Cart cart = (Cart) session.getAttribute(cartSessionAttribute);
         if (cart == null) {
             cart = new Cart();
-            session.setAttribute(CART_SESSION_ATTRIBUTE, cart);
+            session.setAttribute(cartSessionAttribute, cart);
         }
         return cart;
+    }
+
+    private String getCartSessionAttribute(HttpSession session) {
+        Object userIdObj = session.getAttribute(LOGGED_USER_ID_SESSION_ATTRIBUTE);
+        if (userIdObj instanceof Long longValue) {
+            return CART_SESSION_ATTRIBUTE + ":user:" + longValue;
+        }
+
+        if (userIdObj instanceof Integer intValue) {
+            return CART_SESSION_ATTRIBUTE + ":user:" + intValue.longValue();
+        }
+
+        return CART_SESSION_ATTRIBUTE + ":guest:" + session.getId();
     }
 
     private Prodotto findProductOrThrow(Long productId) {
