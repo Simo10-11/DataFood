@@ -44,8 +44,35 @@
       </button>
     </article>
 
+    <div class="loyalty-section" *ngIf="currentUser && currentUser.puntiDisponibili && currentUser.puntiDisponibili > 0">
+      <div class="punti-info">
+        <p><strong>I tuoi punti fedeltà:</strong></p>
+        <p>Punti disponibili: {{ currentUser.puntiDisponibili }}</p>
+        <p>Valore: €{{ currentUser.puntiDisponibili | number:'1.2-2' }}</p>
+      </div>
+
+      <div class="punti-checkbox">
+        <label>
+          <input type="checkbox" [(ngModel)]="usePunti" (change)="onUsePuntiChange()" />
+          Usa i miei punti come sconto
+        </label>
+      </div>
+
+      <div class="discount-preview" *ngIf="discountPreview">
+        <p><strong>Anteprima sconto:</strong></p>
+        <p>Totale originale: €{{ discountPreview.totaleOrdine | number:'1.2-2' }}</p>
+        <p>Sconto: -€{{ discountPreview.scontoApplicabile | number:'1.2-2' }}</p>
+        <p><strong>Nuovo totale: €{{ discountPreview.totaleConSconto | number:'1.2-2' }}</strong></p>
+      </div>
+    </div>
+
     <footer class="cart-total">
-      <strong>Totale: {{ cart.totale | number:'1.2-2' }} EUR</strong>
+      <div class="price-breakdown">
+        <p><strong>Totale: {{ cart.totale | number:'1.2-2' }} EUR</strong></p>
+        <p *ngIf="discountPreview">
+          Totale con sconto: <strong>€{{ discountPreview.totaleConSconto | number:'1.2-2' }}</strong>
+        </p>
+      </div>
       <button type="button" class="checkout-button" (click)="checkout()">
         Checkout
       </button>

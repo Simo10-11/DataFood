@@ -5,6 +5,8 @@ import lombok.Data;
 import java.util.ArrayList;
 import java.util.List;
 
+import it.unife.sample.backend.dto.UtenteDTO;
+
 @Data
 public class OrderDTO {
     private Long id;
@@ -13,4 +15,8 @@ public class OrderDTO {
     private String status;
     private double totale;
     private List<OrderItemDTO> items = new ArrayList<>();
+    private Integer puntiGuadagnati;
+    private Integer puntiUtilizzati;
+    private Double scontoApplicato;
+    private UtenteDTO utenteAggiornato;
 }

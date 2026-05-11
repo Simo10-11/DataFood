@@ -299,6 +299,40 @@
   font-size: 0.85rem;
 }
 
+.punti-section {
+  margin: 0.75rem 0;
+  padding: 0.75rem 0.85rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(248, 245, 233, 0.98), rgba(255, 255, 255, 0.98));
+  border: 1px solid rgba(46, 125, 50, 0.16);
+}
+
+.punti-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.punti-icon {
+  font-size: 1.5rem;
+}
+
+.punti-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.punti-info strong {
+  font-size: 1.1rem;
+  color: var(--color-primary-dark);
+}
+
+.punti-value {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
 .user-menu-item,
 .mobile-menu-item {
   width: 100%;

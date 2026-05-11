@@ -11,6 +11,15 @@ export interface OrderPageResponse {
   size: number;
 }
 
+export interface DiscountPreview {
+  totaleOrdine: number;
+  puntiDisponibili: number;
+  valorePuntiInEuro: number;
+  scontoApplicabile: number;
+  totaleConSconto: number;
+  puntiUtilizzabili: number;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -20,8 +29,9 @@ export class OrderService {
 
   constructor(private http: HttpClient) {}
 
-  checkout(): Observable<Order> {
-    return this.http.post<Order>(`${this.apiUrl}/checkout`, {}, { withCredentials: true });
+  checkout(usePunti: boolean = false): Observable<Order> {
+    const body = { usePunti };
+    return this.http.post<Order>(`${this.apiUrl}/checkout`, body, { withCredentials: true });
   }
 
   getMyOrders(): Observable<Order[]> {
@@ -45,6 +55,10 @@ export class OrderService {
     queryParams.set('search', params.search ?? '');
 
     return this.http.get<OrderPageResponse>(`${this.apiUrl}?${queryParams.toString()}`, { withCredentials: true });
+  }
+
+  previewDiscount(): Observable<DiscountPreview> {
+    return this.http.get<DiscountPreview>(`${this.apiUrl}/preview-discount`, { withCredentials: true });
   }
 
   updateOrderStatus(orderId: number, status: string): Observable<Order> {

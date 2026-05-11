@@ -2,6 +2,7 @@ package it.unife.sample.backend.controller;
 
 import it.unife.sample.backend.dto.OrderDTO;
 import it.unife.sample.backend.dto.OrderStatusUpdateDTO;
+import it.unife.sample.backend.dto.CheckoutRequestDTO;
 import it.unife.sample.backend.service.OrderService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
@@ -29,15 +30,30 @@ public class OrderController {
     }
 
     @PostMapping("/checkout")
-    public ResponseEntity<OrderDTO> checkout(HttpSession session) {
+    public ResponseEntity<OrderDTO> checkout(
+            HttpSession session,
+            @RequestBody(required = false) CheckoutRequestDTO request
+    ) {
         try {
-            return ResponseEntity.ok(orderService.checkout(session));
+            boolean usePunti = request != null && request.isUsePunti();
+            return ResponseEntity.ok(orderService.checkoutWithPoints(session, usePunti));
         } catch (IllegalStateException exception) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (IllegalArgumentException exception) {
             if (isNotFoundError(exception)) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
             }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+    }
+
+    @GetMapping("/preview-discount")
+    public ResponseEntity<?> previewDiscount(HttpSession session) {
+        try {
+            return ResponseEntity.ok(orderService.previewDiscount(session));
+        } catch (IllegalStateException exception) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        } catch (IllegalArgumentException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }

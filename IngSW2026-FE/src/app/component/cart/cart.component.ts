@@ -1,16 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { CartService } from '../../service/cart.service';
-import { OrderService } from '../../service/order.service';
+import { OrderService, DiscountPreview } from '../../service/order.service';
+import { AuthService } from '../../service/auth.service';
 import { Cart } from '../../dto/cart.model';
 import { CartItem } from '../../dto/cart-item.model';
 import { Order } from '../../dto/order.model';
+import { Utente } from '../../dto/utente.model';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './cart.component.html',
   styleUrl: './cart.component.scss'
 })
@@ -20,14 +23,19 @@ export class CartComponent implements OnInit {
   errorMessage = '';
   checkoutMessage = '';
   createdOrder: Order | null = null;
+  usePunti = false;
+  discountPreview: DiscountPreview | null = null;
+  currentUser: Utente | null = null;
 
   constructor(
     private cartService: CartService,
-    private orderService: OrderService
+    private orderService: OrderService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
     this.loadCart();
+    this.currentUser = this.authService.getCurrentUser();
   }
 
   loadCart(): void {
@@ -47,6 +55,27 @@ export class CartComponent implements OnInit {
     });
   }
 
+  onUsePuntiChange(): void {
+    if (this.usePunti) {
+      this.loadDiscountPreview();
+    } else {
+      this.discountPreview = null;
+    }
+  }
+
+  loadDiscountPreview(): void {
+    this.errorMessage = '';
+    this.orderService.previewDiscount().subscribe({
+      next: (preview) => {
+        this.discountPreview = preview;
+      },
+      error: () => {
+        this.errorMessage = 'Impossibile caricare l\'anteprima dello sconto.';
+        this.usePunti = false;
+      }
+    });
+  }
+
   checkout(): void {
     if (!this.cart.items || this.cart.items.length === 0) {
       this.errorMessage = 'Carrello vuoto: aggiungi almeno un prodotto prima del checkout.';
@@ -56,11 +85,28 @@ export class CartComponent implements OnInit {
     this.errorMessage = '';
     this.checkoutMessage = '';
 
-    this.orderService.checkout().subscribe({
+    this.orderService.checkout(this.usePunti).subscribe({
       next: (order) => {
         this.createdOrder = order;
-        this.checkoutMessage = 'Ordine confermato e messo in lavorazione.';
+
+        if (order.utenteAggiornato) {
+          this.authService.saveCurrentUser(order.utenteAggiornato);
+          this.currentUser = order.utenteAggiornato;
+        }
+        
+        // Costruisce messaggio di conferma con punti
+        let message = `Ordine confermato e messo in lavorazione.`;
+        if (order.puntiGuadagnati && order.puntiGuadagnati > 0) {
+          message += ` Hai guadagnato ${order.puntiGuadagnati} punti!`;
+        }
+        if (order.scontoApplicato && order.scontoApplicato > 0) {
+          message += ` Sconto applicato: -€${order.scontoApplicato.toFixed(2)}`;
+        }
+        
+        this.checkoutMessage = message;
         this.cart = { items: [], totale: 0 };
+        this.usePunti = false;
+        this.discountPreview = null;
       },
       error: (errorResponse) => {
         if (errorResponse?.status === 401) {

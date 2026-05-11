@@ -71,6 +71,16 @@
             <span>Accesso rapido al tuo account</span>
           </div>
 
+          <div class="punti-section" *ngIf="user.puntiDisponibili !== undefined">
+            <div class="punti-badge">
+              <span class="punti-icon">⭐</span>
+              <div class="punti-info">
+                <strong>{{ user.puntiDisponibili }}</strong> punti
+                <span class="punti-value">€{{ user.puntiDisponibili | number:'1.2-2' }}</span>
+              </div>
+            </div>
+          </div>
+
           <a *ngIf="user.ruolo === 'admin'" class="user-menu-item" routerLink="/admin/orders" (click)="closeMenus()" role="menuitem">
             <span class="action-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false">

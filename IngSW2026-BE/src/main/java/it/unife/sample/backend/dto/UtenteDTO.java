@@ -9,4 +9,6 @@ public class UtenteDTO {
 	private String nome;
 	private String cognome;
 	private String ruolo;
+	private Integer puntiTotali;
+	private Integer puntiDisponibili;
 }

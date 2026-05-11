@@ -1,4 +1,5 @@
 import { OrderItem } from './order-item.model';
+import { Utente } from './utente.model';
 
 export interface Order {
   id: number;
@@ -7,6 +8,10 @@ export interface Order {
   status: string;
   totale: number;
   items: OrderItem[];
+  puntiGuadagnati?: number;
+  puntiUtilizzati?: number;
+  scontoApplicato?: number;
+  utenteAggiornato?: Utente;
 }
 
 export interface OrderStatusOption {

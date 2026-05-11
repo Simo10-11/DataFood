@@ -68,7 +68,9 @@ public class UtenteService {
 				null,
 				null,
 				null,
-				null
+				null,
+				0,
+				0
 		);
 
 		Utente salvato = utenteRepository.save(nuovoUtente);

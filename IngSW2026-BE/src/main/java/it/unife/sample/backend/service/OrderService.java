@@ -2,6 +2,7 @@ package it.unife.sample.backend.service;
 
 import it.unife.sample.backend.dto.OrderDTO;
 import it.unife.sample.backend.dto.OrderStatusUpdateDTO;
+import it.unife.sample.backend.dto.UtenteDTO;
 import it.unife.sample.backend.mapper.OrderMapper;
 import it.unife.sample.backend.model.Cart;
 import it.unife.sample.backend.model.CartItem;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -38,19 +40,23 @@ public class OrderService {
     private final ProdottoRepository prodottoRepository;
     private final UtenteRepository utenteRepository;
     private final OrderMapper orderMapper;
+    private final PuntiService puntiService;
 
     public OrderService(
             OrdineRepository ordineRepository,
             ProdottoRepository prodottoRepository,
             UtenteRepository utenteRepository,
-            OrderMapper orderMapper
+            OrderMapper orderMapper,
+            PuntiService puntiService
     ) {
         this.ordineRepository = ordineRepository;
         this.prodottoRepository = prodottoRepository;
         this.utenteRepository = utenteRepository;
         this.orderMapper = orderMapper;
+        this.puntiService = puntiService;
     }
 
+    @Transactional
     public OrderDTO checkout(HttpSession session) {
         Cart cart = (Cart) session.getAttribute(CART_SESSION_ATTRIBUTE);
 
@@ -89,11 +95,158 @@ public class OrderService {
         }
 
         // Forziamo il calcolo del totale prima del save per intercettare eventuali null lato item.
-        calculateTotal(ordine);
+        BigDecimal totaleOrdine = calculateTotal(ordine);
+        ordine.setTotalePagato(totaleOrdine);
+
+        // Calcolo punti guadagnati
+        int puntiGuadagnati = puntiService.calculatePuntiGuadagnati(totaleOrdine);
 
         Ordine saved = ordineRepository.save(ordine);
+
+        // Aggiunta punti all'utente
+        if (puntiGuadagnati > 0) {
+            puntiService.aggiungiPunti(utente, puntiGuadagnati);
+            // Ricarica l'utente per ottenere i punti aggiornati
+            utente = utenteRepository.findById(utente.getId())
+                    .orElseThrow(() -> new IllegalStateException("Utente non autenticato"));
+        }
+
         session.removeAttribute(CART_SESSION_ATTRIBUTE);
-        return orderMapper.toDTO(saved);
+
+        OrderDTO result = orderMapper.toDTO(saved);
+        result.setPuntiGuadagnati(puntiGuadagnati);
+        result.setUtenteAggiornato(toUtenteDTO(utente));
+
+        return result;
+    }
+
+    /**
+     * Checkout con applicazione sconto punti
+     * Se usePunti è true, applica il massimo sconto possibile usando i punti disponibili
+     */
+    @Transactional
+    public OrderDTO checkoutWithPoints(HttpSession session, boolean usePunti) {
+        Cart cart = (Cart) session.getAttribute(CART_SESSION_ATTRIBUTE);
+
+        if (cart == null || cart.getItems() == null || cart.getItems().isEmpty()) {
+            throw new IllegalArgumentException("Carrello vuoto");
+        }
+
+        Utente utente = getLoggedUser(session);
+
+        Ordine ordine = new Ordine();
+        ordine.setData(LocalDateTime.now());
+        ordine.setStatus(OrderStatus.IN_LAVORAZIONE.getDbValue());
+        ordine.setUtente(utente);
+
+        for (CartItem cartItem : cart.getItems()) {
+            if (cartItem.getQuantita() <= 0) {
+                continue;
+            }
+
+            Integer productId = convertProductId(cartItem.getProductId());
+
+            Prodotto prodotto = prodottoRepository.findById(productId)
+                    .orElseThrow(() -> new IllegalArgumentException("Prodotto non trovato"));
+
+            OrdineProdotto ordineProdotto = new OrdineProdotto();
+            ordineProdotto.setOrdine(ordine);
+            ordineProdotto.setProdotto(prodotto);
+            ordineProdotto.setQuantita(cartItem.getQuantita());
+            ordineProdotto.setPrezzoUnitario(prodotto.getPrezzo());
+
+            ordine.getItems().add(ordineProdotto);
+        }
+
+        if (ordine.getItems().isEmpty()) {
+            throw new IllegalArgumentException("Carrello vuoto");
+        }
+
+        BigDecimal totaleOrdine = calculateTotal(ordine);
+
+        // Applicazione sconto con punti
+        int puntiUtilizzati = 0;
+        double scontoApplicato = 0.0;
+
+        if (usePunti && utente.getPuntiDisponibili() > 0) {
+            PuntiService.DiscountResult discountResult = puntiService.applicaScontoWithPunti(
+                    utente.getPuntiDisponibili(),
+                    totaleOrdine
+            );
+            puntiUtilizzati = discountResult.puntiUtilizzati;
+            scontoApplicato = discountResult.scontoApplicato;
+            totaleOrdine = discountResult.nuovoTotale;
+        }
+
+        ordine.setTotalePagato(totaleOrdine);
+
+        Ordine saved = ordineRepository.save(ordine);
+
+        // Calcolo punti guadagnati sul totale DOPO lo sconto
+        int puntiGuadagnati = puntiService.calculatePuntiGuadagnati(totaleOrdine);
+
+        // Uso punti (se applicati)
+        if (puntiUtilizzati > 0) {
+            puntiService.usaPunti(utente, puntiUtilizzati);
+        }
+
+        // Aggiunta punti guadagnati
+        if (puntiGuadagnati > 0) {
+            puntiService.aggiungiPunti(utente, puntiGuadagnati);
+        }
+
+        // Ricarica l'utente per ottenere i punti aggiornati
+        utente = utenteRepository.findById(utente.getId())
+                .orElseThrow(() -> new IllegalStateException("Utente non autenticato"));
+
+        session.removeAttribute(CART_SESSION_ATTRIBUTE);
+
+        OrderDTO result = orderMapper.toDTO(saved);
+        result.setPuntiGuadagnati(puntiGuadagnati);
+        result.setPuntiUtilizzati(puntiUtilizzati);
+        result.setScontoApplicato(scontoApplicato);
+        result.setUtenteAggiornato(toUtenteDTO(utente));
+
+        return result;
+    }
+
+    /**
+     * Restituisce preview dello sconto se l'utente usa i suoi punti
+     */
+    public java.util.Map<String, Object> previewDiscount(HttpSession session) {
+        Cart cart = (Cart) session.getAttribute(CART_SESSION_ATTRIBUTE);
+
+        if (cart == null || cart.getItems() == null || cart.getItems().isEmpty()) {
+            throw new IllegalArgumentException("Carrello vuoto");
+        }
+
+        Utente utente = getLoggedUser(session);
+
+        // Calcola totale ordine
+        BigDecimal totaleOrdine = BigDecimal.ZERO;
+        for (CartItem cartItem : cart.getItems()) {
+            if (cartItem.getQuantita() > 0) {
+                totaleOrdine = totaleOrdine.add(
+                        BigDecimal.valueOf(cartItem.getPrezzo())
+                                .multiply(BigDecimal.valueOf(cartItem.getQuantita()))
+                );
+            }
+        }
+
+        // Calcola sconto disponibile
+        PuntiService.DiscountResult discountResult = puntiService.applicaScontoWithPunti(
+                utente.getPuntiDisponibili(),
+                totaleOrdine
+        );
+
+        return java.util.Map.ofEntries(
+                java.util.Map.entry("totaleOrdine", totaleOrdine.doubleValue()),
+                java.util.Map.entry("puntiDisponibili", utente.getPuntiDisponibili()),
+                java.util.Map.entry("valorePuntiInEuro", puntiService.convertPuntiToEuro(utente.getPuntiDisponibili())),
+                java.util.Map.entry("scontoApplicabile", discountResult.scontoApplicato),
+                java.util.Map.entry("totaleConSconto", discountResult.nuovoTotale.doubleValue()),
+                java.util.Map.entry("puntiUtilizzabili", discountResult.puntiUtilizzati)
+        );
     }
 
     public List<OrderDTO> getMyOrders(HttpSession session) {
@@ -226,7 +379,15 @@ public class OrderService {
     }
 
     private BigDecimal calculateTotal(Ordine order) {
-        if (order == null || order.getItems() == null) {
+        if (order == null) {
+            return BigDecimal.ZERO;
+        }
+
+        if (order.getTotalePagato() != null) {
+            return order.getTotalePagato();
+        }
+
+        if (order.getItems() == null) {
             return BigDecimal.ZERO;
         }
 
@@ -240,5 +401,21 @@ public class OrderService {
             throw new IllegalArgumentException("Prodotto non trovato");
         }
         return productId.intValue();
+    }
+
+    private UtenteDTO toUtenteDTO(Utente utente) {
+        if (utente == null) {
+            return null;
+        }
+
+        UtenteDTO dto = new UtenteDTO();
+        dto.setId(utente.getId());
+        dto.setEmail(utente.getEmail());
+        dto.setNome(utente.getNome());
+        dto.setCognome(utente.getCognome());
+        dto.setRuolo(utente.getRuolo());
+        dto.setPuntiTotali(utente.getPuntiTotali());
+        dto.setPuntiDisponibili(utente.getPuntiDisponibili());
+        return dto;
     }
 }

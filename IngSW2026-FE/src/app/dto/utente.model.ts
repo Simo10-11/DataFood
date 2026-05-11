@@ -4,4 +4,6 @@ export interface Utente {
   nome: string;
   cognome: string;
   ruolo?: string;
+  puntiTotali?: number;
+  puntiDisponibili?: number;
 }

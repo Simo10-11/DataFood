@@ -15,6 +15,10 @@ public interface OrderMapper {
     @Mapping(target = "nomeCliente", expression = "java(buildCustomerName(entity))")
     @Mapping(target = "data", expression = "java(entity.getData() != null ? entity.getData().toString() : null)")
     @Mapping(target = "totale", expression = "java(calculateTotal(entity))")
+    @Mapping(target = "puntiGuadagnati", ignore = true)
+    @Mapping(target = "puntiUtilizzati", ignore = true)
+    @Mapping(target = "scontoApplicato", ignore = true)
+    @Mapping(target = "utenteAggiornato", ignore = true)
     OrderDTO toDTO(Ordine entity);
 
     @Mapping(target = "productId", source = "prodotto.id")
@@ -27,7 +31,15 @@ public interface OrderMapper {
     }
 
     default double calculateTotal(Ordine entity) {
-        if (entity == null || entity.getItems() == null) {
+        if (entity == null) {
+            return 0d;
+        }
+
+        if (entity.getTotalePagato() != null) {
+            return entity.getTotalePagato().doubleValue();
+        }
+
+        if (entity.getItems() == null) {
             return 0d;
         }
 

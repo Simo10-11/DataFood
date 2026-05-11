@@ -37,6 +37,9 @@ public class Ordine {
     @Column(name = "STATUS", nullable = false)
     private String status;
 
+    @Column(name = "TOTALE_PAGATO")
+    private java.math.BigDecimal totalePagato;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ID_UTENTE", nullable = false)
     private Utente utente;

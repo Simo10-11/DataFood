@@ -6,6 +6,7 @@ import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../service/auth.service';
 import { CartService } from '../../service/cart.service';
+import { Utente } from '../../dto/utente.model';
 
 @Component({
   selector: 'app-navbar',
@@ -21,6 +22,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   userMenuOpen = false;
   mobileMenuOpen = false;
   cartItemCount = 0;
+  currentUser: Utente | null = null;
   // Flag UI locale: quando true mostriamo i pulsanti di conferma logout.
   logoutConfirmationVisible = false;
   private readonly subscriptions = new Subscription();
@@ -32,8 +34,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.currentUser = this.authService.getCurrentUser();
+
     this.subscriptions.add(
       this.authService.currentUser$.subscribe((user) => {
+        this.currentUser = user;
+
         if (!user) {
           this.cartItemCount = 0;
           this.userMenuOpen = false;
@@ -49,11 +55,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
-  }
-
-  get currentUser() {
-    // Lo leggiamo dal service cosi tutta la logica di persistenza resta centralizzata.
-    return this.authService.getCurrentUser();
   }
 
   onSearchInput(): void {
