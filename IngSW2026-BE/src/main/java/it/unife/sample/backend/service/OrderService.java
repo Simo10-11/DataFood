@@ -58,7 +58,7 @@ public class OrderService {
 
     @Transactional
     public OrderDTO checkout(HttpSession session) {
-        Cart cart = (Cart) session.getAttribute(CART_SESSION_ATTRIBUTE);
+        Cart cart = getCartFromSession(session);
 
         if (cart == null || cart.getItems() == null || cart.getItems().isEmpty()) {
             throw new IllegalArgumentException("Carrello vuoto");
@@ -111,7 +111,7 @@ public class OrderService {
                     .orElseThrow(() -> new IllegalStateException("Utente non autenticato"));
         }
 
-        session.removeAttribute(CART_SESSION_ATTRIBUTE);
+        session.removeAttribute(getCartSessionAttribute(session));
 
         OrderDTO result = orderMapper.toDTO(saved);
         result.setPuntiGuadagnati(puntiGuadagnati);
@@ -126,7 +126,7 @@ public class OrderService {
      */
     @Transactional
     public OrderDTO checkoutWithPoints(HttpSession session, boolean usePunti) {
-        Cart cart = (Cart) session.getAttribute(CART_SESSION_ATTRIBUTE);
+        Cart cart = getCartFromSession(session);
 
         if (cart == null || cart.getItems() == null || cart.getItems().isEmpty()) {
             throw new IllegalArgumentException("Carrello vuoto");
@@ -199,7 +199,7 @@ public class OrderService {
         utente = utenteRepository.findById(utente.getId())
                 .orElseThrow(() -> new IllegalStateException("Utente non autenticato"));
 
-        session.removeAttribute(CART_SESSION_ATTRIBUTE);
+        session.removeAttribute(getCartSessionAttribute(session));
 
         OrderDTO result = orderMapper.toDTO(saved);
         result.setPuntiGuadagnati(puntiGuadagnati);
@@ -214,7 +214,7 @@ public class OrderService {
      * Restituisce preview dello sconto se l'utente usa i suoi punti
      */
     public java.util.Map<String, Object> previewDiscount(HttpSession session) {
-        Cart cart = (Cart) session.getAttribute(CART_SESSION_ATTRIBUTE);
+        Cart cart = getCartFromSession(session);
 
         if (cart == null || cart.getItems() == null || cart.getItems().isEmpty()) {
             throw new IllegalArgumentException("Carrello vuoto");
@@ -320,6 +320,23 @@ public class OrderService {
 
         return utenteRepository.findById(userId)
                 .orElseThrow(() -> new IllegalStateException("Utente non autenticato"));
+    }
+
+    private Cart getCartFromSession(HttpSession session) {
+        return (Cart) session.getAttribute(getCartSessionAttribute(session));
+    }
+
+    private String getCartSessionAttribute(HttpSession session) {
+        Object userIdObj = session.getAttribute(LOGGED_USER_ID_SESSION_ATTRIBUTE);
+        if (userIdObj instanceof Long longValue) {
+            return CART_SESSION_ATTRIBUTE + ":user:" + longValue;
+        }
+
+        if (userIdObj instanceof Integer intValue) {
+            return CART_SESSION_ATTRIBUTE + ":user:" + intValue.longValue();
+        }
+
+        return CART_SESSION_ATTRIBUTE + ":guest:" + session.getId();
     }
 
     private void requireAdmin(HttpSession session) {
