@@ -15,7 +15,7 @@
       <input
         type="text"
         class="search"
-        placeholder="Cerca prodotti freschi, marca o reparto"
+        placeholder="Cerca dei prdotti..."
         [(ngModel)]="searchText"
         (input)="onSearchInput()"
       />
@@ -141,8 +141,18 @@
 
     <ng-template #guestActions>
       <div class="desktop-actions guest-actions">
-        <a class="ghost-button" routerLink="/login">Login</a>
-        <a class="solid-button" routerLink="/register">Registrati</a>
+        <a class="ghost-button guest-button login-button" routerLink="/login">
+          <span class="guest-button-copy">
+            <span class="guest-button-label">Login</span>
+            <span class="guest-button-subtitle">Accedi al tuo account</span>
+          </span>
+        </a>
+        <a class="solid-button guest-button register-button" routerLink="/register">
+          <span class="guest-button-copy">
+            <span class="guest-button-label">Registrati</span>
+            <span class="guest-button-subtitle">Crea il tuo profilo</span>
+          </span>
+        </a>
       </div>
 
       <div class="mobile-actions guest-mobile-actions">
@@ -185,10 +195,10 @@
     </div>
 
     <ng-template #mobileGuestMenu>
-      <a class="mobile-menu-item" routerLink="/login" (click)="closeMenus()">
+      <a class="mobile-menu-item guest-menu-item login-button" routerLink="/login" (click)="closeMenus()">
         <span>Login</span>
       </a>
-      <a class="mobile-menu-item" routerLink="/register" (click)="closeMenus()">
+      <a class="mobile-menu-item guest-menu-item accent register-button" routerLink="/register" (click)="closeMenus()">
         <span>Registrati</span>
       </a>
     </ng-template>
