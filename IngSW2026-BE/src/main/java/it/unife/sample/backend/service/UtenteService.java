@@ -10,6 +10,7 @@ import it.unife.sample.backend.repository.UtenteRepository;
 import it.unife.sample.backend.repository.WishlistRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -21,18 +22,21 @@ public class UtenteService {
 	private final UtenteMapper utenteMapper;
 	private final OrdineRepository ordineRepository;
 	private final WishlistRepository wishlistRepository;
+	private final PasswordEncoder passwordEncoder;	//singlenton per default
 	private static final String LOGGED_USER_ID_SESSION_ATTRIBUTE = "loggedUserId";
 
 	public UtenteService(
 			UtenteRepository utenteRepository,
 			UtenteMapper utenteMapper,
 			OrdineRepository ordineRepository,
-			WishlistRepository wishlistRepository
+			WishlistRepository wishlistRepository,
+			PasswordEncoder passwordEncoder
 	) {
 		this.utenteRepository = utenteRepository;
 		this.utenteMapper = utenteMapper;
 		this.ordineRepository = ordineRepository;
 		this.wishlistRepository = wishlistRepository;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	public UtenteDTO login(LoginRequestDTO request) {
@@ -40,9 +44,9 @@ public class UtenteService {
 		Utente utente = utenteRepository.findByEmail(request.getEmail())
 				.orElseThrow(() -> new IllegalArgumentException("Utente non trovato"));
 
-		// Password in chiaro solo per il progetto didattico.
-		// In una versione reale qui andrebbe hash + confronto sicuro.
-		if (!utente.getPassword().equals(request.getPassword())) {
+		// La password in input e plain text ma nel DB abbiamo solo hash
+		// matches fa hash+salt internamente e confronta in modo corretto
+		if (!passwordEncoder.matches(request.getPassword(), utente.getPassword())) {
 			throw new IllegalArgumentException("Password errata");
 		}
 
@@ -56,7 +60,9 @@ public class UtenteService {
 			throw new IllegalArgumentException("Email gia registrata");
 		}
 
-		// Password in chiaro solo per esercitazione universitaria.
+		// Durante la registrazione salviamo solo la versione hashata della password
+		String hashedPassword = passwordEncoder.encode(request.getPassword());
+
 		Utente nuovoUtente = new Utente(
 				null,
 				request.getNome(),
@@ -64,7 +70,7 @@ public class UtenteService {
 				null,
 				"cliente",
 				request.getEmail(),
-				request.getPassword(),
+				hashedPassword,
 				null,
 				null,
 				null,
