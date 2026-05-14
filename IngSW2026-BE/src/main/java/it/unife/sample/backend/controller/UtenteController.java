@@ -41,9 +41,13 @@ public class UtenteController {
 	}
 
 	@PostMapping({"/auth/register", "/api/auth/register"})
-	public ResponseEntity<UtenteDTO> register(@RequestBody RegisterRequestDTO request) {
+	public ResponseEntity<UtenteDTO> register(@RequestBody RegisterRequestDTO request, HttpSession session) {
 		try {
-			return ResponseEntity.status(HttpStatus.CREATED).body(utenteService.register(request));
+			// Dopo la registrazione creiamo subito la sessione backend come al login
+			UtenteDTO registeredUser = utenteService.register(request);
+			session.setAttribute("loggedUserId", registeredUser.getId());
+			session.setAttribute("loggedUserRole", registeredUser.getRuolo());
+			return ResponseEntity.status(HttpStatus.CREATED).body(registeredUser);
 		} catch (IllegalArgumentException exception) {
 			// Email gia presente: restituiamo errore client senza esporre dettagli sensibili.
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
