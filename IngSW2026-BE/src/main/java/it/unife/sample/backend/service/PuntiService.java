@@ -15,11 +15,9 @@ public class PuntiService {
     private static final int VALORE_PUNTO_EURO = 1;
 
     private final UtenteRepository utenteRepository;
-    private final LeaderboardService leaderboardService;
 
-    public PuntiService(UtenteRepository utenteRepository, LeaderboardService leaderboardService) {
+    public PuntiService(UtenteRepository utenteRepository) {
         this.utenteRepository = utenteRepository;
-        this.leaderboardService = leaderboardService;
     }
 
     /**

@@ -76,14 +76,6 @@
             </div>
           </div>
 
-          <div class="rank-section" *ngIf="userRank !== null && userRank > 0">
-            <div class="rank-badge">
-              <div class="rank-info">
-                <strong>#{{ userRank }}</strong> in classifica
-                <span class="rank-value">Classifica</span>
-              </div>
-            </div>
-          </div>
 
           <a *ngIf="user.ruolo === 'admin'" class="user-menu-item" routerLink="/admin/orders" (click)="closeMenus()" role="menuitem">
             <span>Admin panel</span>
@@ -93,9 +85,7 @@
             <span>I miei ordini</span>
           </a>
 
-          <a class="user-menu-item" routerLink="/leaderboard" (click)="closeMenus()" role="menuitem">
-            <span>Classifica</span>
-          </a>
+          
 
           <button class="user-menu-item danger" type="button" (click)="requestLogout()" role="menuitem">
             <span>Logout</span>
@@ -178,9 +168,7 @@
       <a class="mobile-menu-item" routerLink="/orders" (click)="closeMenus()">
         <span>I miei ordini</span>
       </a>
-      <a class="mobile-menu-item" routerLink="/leaderboard" (click)="closeMenus()">
-        <span>Classifica</span>
-      </a>
+      
       <button class="mobile-menu-item danger" type="button" (click)="requestLogout()">
         <span>Logout</span>
       </button>

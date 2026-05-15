@@ -6,7 +6,6 @@ import { WishlistComponent } from './component/wishlist/wishlist.component';
 import { CartComponent } from './component/cart/cart.component';
 import { OrdersComponent } from './component/orders/orders.component';
 import { AdminOrdersComponent } from './component/admin-orders/admin-orders.component';
-import { LeaderboardComponent } from './component/leaderboard/leaderboard.component';
 
 export const routes: Routes = [
   { path: '', component: HomeComponent },
@@ -15,7 +14,7 @@ export const routes: Routes = [
   { path: 'wishlist', component: WishlistComponent },
   { path: 'cart', component: CartComponent },
   { path: 'orders', component: OrdersComponent },
-  { path: 'leaderboard', component: LeaderboardComponent },
+  
   { path: 'admin/orders', component: AdminOrdersComponent },
   { path: '**', redirectTo: '' }
 ];
