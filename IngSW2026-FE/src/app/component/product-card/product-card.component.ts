@@ -1,10 +1,11 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Prodotto } from '../../dto/prodotto.model';
 import { AuthService } from '../../service/auth.service';
 import { WishlistService } from '../../service/wishlist.service';
 import { CartService } from '../../service/cart.service';
 import { Wishlist } from '../../dto/wishlist.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-product-card',
@@ -13,7 +14,7 @@ import { Wishlist } from '../../dto/wishlist.model';
   templateUrl: './product-card.component.html',
   styleUrl: './product-card.component.scss'
 })
-export class ProductCardComponent {
+export class ProductCardComponent implements OnInit, OnDestroy {
   @Input({ required: true }) prodotto!: Prodotto;
   @Input() set isInWishlist(value: boolean) {
     this.wishlistSelected = value;
@@ -24,6 +25,7 @@ export class ProductCardComponent {
   utenteId?: number;
   cartMessage = '';
   cartErrorMessage = '';
+  private authSub?: Subscription;
 
   constructor(
     private wishlistService: WishlistService,
@@ -31,6 +33,20 @@ export class ProductCardComponent {
     private cartService: CartService
   ) {
     this.utenteId = this.authService.getCurrentUser()?.id;
+  }
+
+  ngOnInit(): void {
+    this.authSub = this.authService.currentUser$.subscribe(user => {
+      this.utenteId = user?.id;
+      if (!user) {
+        // reset wishlist visual state when user logs out
+        this.wishlistSelected = false;
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.authSub?.unsubscribe();
   }
 
   decrementQuantity(): void {
