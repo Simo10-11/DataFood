@@ -15,6 +15,8 @@ import java.util.List;
 @Service
 public class WishlistService {
 
+    // Logica per aggiungere e rimuovere elementi dalla wishlist
+
     private final WishlistRepository wishlistRepository;
     private final UtenteRepository utenteRepository;
     private final ProdottoRepository prodottoRepository;

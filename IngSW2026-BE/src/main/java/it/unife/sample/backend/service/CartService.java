@@ -16,6 +16,8 @@ import java.util.Optional;
 @Service
 public class CartService {
 
+    // Servizio che gestisce la logica del carrello e l'integrazione con il repository prodotti
+
     private static final String CART_SESSION_ATTRIBUTE = "cart";
     private static final String LOGGED_USER_ID_SESSION_ATTRIBUTE = "loggedUserId";
 

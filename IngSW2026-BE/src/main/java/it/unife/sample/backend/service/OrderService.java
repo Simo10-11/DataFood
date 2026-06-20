@@ -33,6 +33,8 @@ import java.util.List;
 @Service
 public class OrderService {
 
+    // Gestisce la creazione e la gestione degli ordini
+
     private static final String CART_SESSION_ATTRIBUTE = "cart";
     private static final String LOGGED_USER_ID_SESSION_ATTRIBUTE = "loggedUserId";
 

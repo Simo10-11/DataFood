@@ -7,6 +7,8 @@ import java.util.Objects;
 
 public class Cart {
 
+    // Modello in memoria che rappresenta il carrello dell'utente in sessione
+
     private List<CartItem> items = new ArrayList<>();
 
     public List<CartItem> getItems() {

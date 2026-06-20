@@ -14,6 +14,8 @@ public class WishlistMapper {
         // Utility class: non istanziabile.
     }
 
+    // Converte tra entita wishlist e oggetti DTO semplici
+
     public static WishlistDTO toDTO(Wishlist entity) {
         WishlistDTO dto = new WishlistDTO();
         dto.setId(entity.getId());

@@ -7,6 +7,8 @@ import it.unife.sample.backend.model.CartItem;
 
 public class CartMapper {
 
+    // Mapper per convertire tra entita Cart e DTO correlati
+
     private CartMapper() {
     }
 

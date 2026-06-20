@@ -21,6 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping({"/api/orders", "/orders"})
+// Gestisce le richieste relative agli ordini
 public class OrderController {
 
     private final OrderService orderService;

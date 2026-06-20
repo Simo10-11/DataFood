@@ -19,6 +19,7 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "WISHLIST")
+// Entita wishlist che collega utenti e prodotti
 public class Wishlist {
 
     @Id

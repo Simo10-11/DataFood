@@ -9,6 +9,8 @@ import java.util.List;
 @Repository
 public interface ProdottoRepository extends JpaRepository<Prodotto, Integer> {
 
+    // Repository per operazioni sui prodotti usati dal carrello e dalle API 
+
     List<Prodotto> findByNomeContainingIgnoreCase(String nome);
 
     List<Prodotto> findByCategoria_Id(Integer categoriaId);

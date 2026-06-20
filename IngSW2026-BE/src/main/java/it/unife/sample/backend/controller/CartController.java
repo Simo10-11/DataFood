@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping({"/api/cart", "/cart"})
+// Espone endpoint REST per operazioni sul carrello usando HttpSession per identificare l'utente
 public class CartController {
 
     private final CartService cartService;

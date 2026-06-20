@@ -13,7 +13,6 @@ public class ProdottoDTO {
     private BigDecimal prezzo;
     private Integer quantitaDisponibile;
     private String imageUrl;
-    // Dati categoria in forma piatta per semplificare il consumo lato Angular.
     private Integer idCategoria;
     private String nomeCategoria;
 }

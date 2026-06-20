@@ -8,6 +8,7 @@ import java.util.List;
 
 @Repository
 public interface OrdineRepository extends JpaRepository<Ordine, Long> {
+    // Operazioni di accesso al database per gli ordini
     List<Ordine> findByUtenteId(Long userId);
 
     void deleteByUtenteId(Long userId);

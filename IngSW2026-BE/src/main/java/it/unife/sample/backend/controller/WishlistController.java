@@ -17,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping({"/api/wishlist", "/wishlist"})
+// Gestisce API per la wishlist degli utenti
 public class WishlistController {
 
     private final WishlistService wishlistService;

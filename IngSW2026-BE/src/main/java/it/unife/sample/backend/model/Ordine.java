@@ -24,6 +24,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "ORDINE")
+// Entita che rappresenta un ordine nel database
 public class Ordine {
 
     @Id

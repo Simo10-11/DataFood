@@ -1,6 +1,5 @@
 package it.unife.sample.backend.service;
 
-import it.unife.sample.backend.model.Ordine;
 import it.unife.sample.backend.model.Utente;
 import it.unife.sample.backend.repository.UtenteRepository;
 import org.springframework.stereotype.Service;
@@ -34,7 +33,7 @@ public class PuntiService {
     /**
      * Aggiorna i punti dopo la conferma ordine
      * - Incrementa sia puntiTotali che puntiDisponibili
-     * - Incrementa puntiGiornalieri (per la leaderboard)
+     * - Incrementa puntiGiornalieri 
      * - Salva nel database
      */
     @Transactional

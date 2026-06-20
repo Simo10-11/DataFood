@@ -4,7 +4,7 @@ import it.unife.sample.backend.dto.CategoriaDTO;
 import it.unife.sample.backend.model.Categoria;
 import org.mapstruct.Mapper;
 
-// Mapper dichiarativo: MapStruct genera la classe concreta e Spring la inietta come bean.
+
 @Mapper(componentModel = "spring")
 public interface CategoriaMapper {
 

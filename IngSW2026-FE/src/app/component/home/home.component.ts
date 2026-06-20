@@ -18,7 +18,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   prodotti: Prodotto[] = [];
   categorie: Categoria[] = [];
   categoriaSelezionataId?: number;

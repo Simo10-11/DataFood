@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 import java.math.BigDecimal;
 
 @Mapper(componentModel = "spring")
+// Converte Ordine in DTO leggibili dall'API
 public interface OrderMapper {
 
     @Mapping(target = "nomeCliente", expression = "java(buildCustomerName(entity))")
