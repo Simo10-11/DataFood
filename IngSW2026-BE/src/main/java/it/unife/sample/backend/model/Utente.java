@@ -52,12 +52,8 @@ public class Utente {
 	@Column(name = "NUMERO_CIVICO")
 	private String numeroCivico;
 
-	@Column(name = "PUNTI_TOTALI", nullable = false)
-	private Integer puntiTotali = 0;
-
 	@Column(name = "PUNTI_DISPONIBILI", nullable = false)
 	private Integer puntiDisponibili = 0;
 
-	@Column(name = "PUNTI_GIORNALIERI", nullable = false)
-	private Integer puntiGiornalieri = 0;
+    
 }

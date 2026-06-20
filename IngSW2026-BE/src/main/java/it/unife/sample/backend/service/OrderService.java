@@ -433,7 +433,6 @@ public class OrderService {
         dto.setNome(utente.getNome());
         dto.setCognome(utente.getCognome());
         dto.setRuolo(utente.getRuolo());
-        dto.setPuntiTotali(utente.getPuntiTotali());
         dto.setPuntiDisponibili(utente.getPuntiDisponibili());
         return dto;
     }

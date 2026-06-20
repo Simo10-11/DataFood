@@ -17,8 +17,6 @@ public interface UtenteMapper {
 	@Mapping(target = "cap", ignore = true)
 	@Mapping(target = "via", ignore = true)
 	@Mapping(target = "numeroCivico", ignore = true)
-	@Mapping(target = "puntiTotali", ignore = true)
 	@Mapping(target = "puntiDisponibili", ignore = true)
-	@Mapping(target = "puntiGiornalieri", ignore = true)
 	Utente toEntity(UtenteDTO dto);
 }

@@ -32,9 +32,8 @@ public class PuntiService {
 
     /**
      * Aggiorna i punti dopo la conferma ordine
-     * - Incrementa sia puntiTotali che puntiDisponibili
-     * - Incrementa puntiGiornalieri 
-     * - Salva nel database
+    * - Incrementa puntiDisponibili
+    * - Salva nel database
      */
     @Transactional
     public void aggiungiPunti(Utente utente, int puntiGuadagnati) {
@@ -42,9 +41,7 @@ public class PuntiService {
             return;
         }
 
-        utente.setPuntiTotali(utente.getPuntiTotali() + puntiGuadagnati);
         utente.setPuntiDisponibili(utente.getPuntiDisponibili() + puntiGuadagnati);
-        utente.setPuntiGiornalieri(utente.getPuntiGiornalieri() + puntiGuadagnati);
 
         utenteRepository.save(utente);
     }
