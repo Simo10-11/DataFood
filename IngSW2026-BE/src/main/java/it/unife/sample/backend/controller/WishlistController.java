@@ -26,11 +26,13 @@ public class WishlistController {
         this.wishlistService = wishlistService;
     }
 
+    // Restituisce la wishlist di un utente specifico
     @GetMapping("/{utenteId}")
     public ResponseEntity<List<WishlistDTO>> getWishlistByUtente(@PathVariable Long utenteId) {
         return ResponseEntity.ok(wishlistService.getWishlistByUtente(utenteId));
     }
 
+    // Aggiunge un prodotto alla wishlist
     @PostMapping
     public ResponseEntity<WishlistDTO> addToWishlist(@RequestBody WishlistDTO dto) {
         try {
@@ -43,6 +45,7 @@ public class WishlistController {
         }
     }
 
+    // Rimuove un elemento wishlist tramite id
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> removeFromWishlist(@PathVariable Long id) {
         try {
@@ -53,6 +56,7 @@ public class WishlistController {
         }
     }
 
+    // Rimuove un prodotto dalla wishlist usando utente e prodotto
     @DeleteMapping
     public ResponseEntity<Void> removeFromWishlistByProduct(
             @RequestParam Long utenteId,

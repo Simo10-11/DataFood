@@ -31,13 +31,14 @@ public class CategoriaService {
         this.utenteRepository = utenteRepository;
     }
 
+    // Restituisce tutte le categorie disponibili
     public List<CategoriaDTO> findAll() {
-        // Recupera tutte le categorie e le converte in DTO.
         return categoriaRepository.findAll().stream()
                 .map(categoriaMapper::toDTO)
                 .toList();
     }
 
+    // Crea una nuova categoria se l'utente ha i permessi
     public CategoriaDTO create(CategoriaDTO request, HttpSession session) {
         requireAdmin(session);
         validateRequest(request);
@@ -55,6 +56,7 @@ public class CategoriaService {
         return categoriaMapper.toDTO(saved);
     }
 
+    // Aggiorna una categoria esistente
     public CategoriaDTO update(Integer id, CategoriaDTO request, HttpSession session) {
         requireAdmin(session);
 
@@ -82,6 +84,7 @@ public class CategoriaService {
         return categoriaMapper.toDTO(saved);
     }
 
+    // Elimina una categoria se non ha vincoli con altri dati
     public void delete(Integer id, HttpSession session) {
         requireAdmin(session);
 

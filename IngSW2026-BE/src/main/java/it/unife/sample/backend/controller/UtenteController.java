@@ -25,35 +25,33 @@ public class UtenteController {
 		this.utenteService = utenteService;
 	}
 
+	// Autentica l'utente e salva i dati minimi nella sessione
 	@PostMapping({"/auth/login", "/api/auth/login"})
 	public ResponseEntity<UtenteDTO> login(@RequestBody LoginRequestDTO request, HttpSession session) {
 		try {
-			// Qui teniamo il controller minimale: delega tutta la logica al service.
 			UtenteDTO loggedUser = utenteService.login(request);
 			session.setAttribute("loggedUserId", loggedUser.getId());
 			session.setAttribute("loggedUserRole", loggedUser.getRuolo());
 			return ResponseEntity.ok(loggedUser);
 		} catch (IllegalArgumentException exception) {
-			// Se email/password non tornano rispondiamo 401.
-			// Evitiamo di dare dettagli per non esporre troppo lato utente.
 			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
 		}
 	}
 
+	// Registra un nuovo utente e apre subito la sessione
 	@PostMapping({"/auth/register", "/api/auth/register"})
 	public ResponseEntity<UtenteDTO> register(@RequestBody RegisterRequestDTO request, HttpSession session) {
 		try {
-			// Dopo la registrazione creiamo subito la sessione backend come al login
 			UtenteDTO registeredUser = utenteService.register(request);
 			session.setAttribute("loggedUserId", registeredUser.getId());
 			session.setAttribute("loggedUserRole", registeredUser.getRuolo());
 			return ResponseEntity.status(HttpStatus.CREATED).body(registeredUser);
 		} catch (IllegalArgumentException exception) {
-			// Email gia presente: restituiamo errore client senza esporre dettagli sensibili.
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 		}
 	}
 
+	// Chiude la sessione dell'utente corrente
 	@PostMapping({"/auth/logout", "/api/auth/logout"})
 	public ResponseEntity<Void> logout(HttpSession session) {
 		session.removeAttribute("loggedUserId");
@@ -61,16 +59,17 @@ public class UtenteController {
 		return ResponseEntity.noContent().build();
 	}
 
+	// Ripristina la sessione a partire dall'utente salvato nel frontend
 	@PostMapping({"/auth/session", "/api/auth/session"})
 	public ResponseEntity<UtenteDTO> restoreSession(@RequestBody RestoreSessionRequest request, HttpSession session) {
 		try {
-			// Ripristino la sessione lato server usando l utente salvato nel browser
 			return ResponseEntity.ok(utenteService.restoreSession(request.userId(), session));
 		} catch (IllegalArgumentException exception) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 		}
 	}
 
+	// Restituisce l'elenco completo degli utenti
 	@GetMapping({"/api/users", "/users"})
 	public ResponseEntity<List<UtenteDTO>> getAllUsers(HttpSession session) {
 		try {
@@ -80,6 +79,7 @@ public class UtenteController {
 		}
 	}
 
+	// Elimina un utente rispettando i vincoli di permesso
 	@DeleteMapping({"/api/users/{id}", "/users/{id}"})
 	public ResponseEntity<Void> deleteUser(@PathVariable Long id, HttpSession session) {
 		try {
@@ -99,7 +99,7 @@ public class UtenteController {
 		}
 	}
 
-	// Serve solo per ricevere l id utente dal frontend all avvio
+	// Serve solo per ricevere l'id utente dal frontend all'avvio
 	private record RestoreSessionRequest(Long userId) {
 	}
 }

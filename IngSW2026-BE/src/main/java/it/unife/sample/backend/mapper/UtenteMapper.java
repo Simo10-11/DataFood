@@ -8,8 +8,10 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface UtenteMapper {
 
+	// Converte un utente in DTO per l API
 	UtenteDTO toDTO(Utente entity);
 
+	// Converte un DTO utente in entity ignorando i campi gestiti dal backend
 	@Mapping(target = "numeroTelefono", ignore = true)
 	@Mapping(target = "ruolo", ignore = true)
 	@Mapping(target = "password", ignore = true)

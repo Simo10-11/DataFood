@@ -27,24 +27,25 @@ public class ProdottoController {
         this.prodottoService = prodottoService;
     }
 
+    // Restituisce tutti i prodotti del catalogo
     @GetMapping
     public ResponseEntity<List<ProdottoDTO>> getAllProducts() {
-        // Restituisce il catalogo completo prodotti.
         return ResponseEntity.ok(prodottoService.findAll());
     }
 
+    // Cerca i prodotti per nome
     @GetMapping("/search")
     public ResponseEntity<List<ProdottoDTO>> searchProducts(@RequestParam(defaultValue = "") String nome) {
-        // Ricerca prodotti per nome: /products/search?nome=...
         return ResponseEntity.ok(prodottoService.searchByNome(nome));
     }
 
+    // Filtra i prodotti in base alla categoria
     @GetMapping("/categoria/{id}")
     public ResponseEntity<List<ProdottoDTO>> getByCategoria(@PathVariable Integer id) {
-        // Filtra prodotti per categoria: /products/categoria/{id}
         return ResponseEntity.ok(prodottoService.findByCategoriaId(id));
     }
 
+    // Crea un nuovo prodotto nel catalogo
     @PostMapping
     public ResponseEntity<ProdottoDTO> createProduct(@RequestBody ProdottoDTO request, HttpSession session) {
         try {
@@ -59,6 +60,7 @@ public class ProdottoController {
         }
     }
 
+    // Aggiorna i dati di un prodotto esistente
     @PutMapping("/{id}")
     public ResponseEntity<ProdottoDTO> updateProduct(
             @PathVariable Integer id,
@@ -77,6 +79,7 @@ public class ProdottoController {
         }
     }
 
+    // Elimina un prodotto dal catalogo
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Integer id, HttpSession session) {
         try {

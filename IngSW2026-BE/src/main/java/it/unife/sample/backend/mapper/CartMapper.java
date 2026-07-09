@@ -7,11 +7,12 @@ import it.unife.sample.backend.model.CartItem;
 
 public class CartMapper {
 
-    // Mapper per convertire tra entita Cart e DTO correlati
+    // Converte il carrello e i suoi elementi nei DTO esposti dall API
 
     private CartMapper() {
     }
 
+    // Trasforma il carrello completo nel DTO principale
     public static CartDTO toDTO(Cart cart) {
         CartDTO dto = new CartDTO();
 
@@ -25,6 +26,7 @@ public class CartMapper {
         return dto;
     }
 
+    // Trasforma un singolo elemento del carrello nel relativo DTO
     public static CartItemDTO toDTO(CartItem item) {
         CartItemDTO dto = new CartItemDTO();
         dto.setProductId(item.getProductId());

@@ -39,28 +39,24 @@ public class UtenteService {
 		this.passwordEncoder = passwordEncoder;
 	}
 
+	// Autentica un utente verificando email e password hashata
 	public UtenteDTO login(LoginRequestDTO request) {
-		// Primo step: cerchiamo per email, cosi gestiamo il caso "utente inesistente" subito.
 		Utente utente = utenteRepository.findByEmail(request.getEmail())
 				.orElseThrow(() -> new IllegalArgumentException("Utente non trovato"));
 
-		// La password in input e plain text ma nel DB abbiamo solo hash
-		// matches fa hash+salt internamente e confronta in modo corretto
 		if (!passwordEncoder.matches(request.getPassword(), utente.getPassword())) {
 			throw new IllegalArgumentException("Password errata");
 		}
 
-		// Torniamo un DTO per non esporre campi sensibili (es. password).
 		return utenteMapper.toDTO(utente);
 	}
 
+	// Registra un nuovo utente con password hashata
 	public UtenteDTO register(RegisterRequestDTO request) {
-		// Evitiamo duplicati: l'email deve essere univoca.
 		if (utenteRepository.findByEmail(request.getEmail()).isPresent()) {
 			throw new IllegalArgumentException("Email gia registrata");
 		}
 
-		// Durante la registrazione salviamo solo la versione hashata della password
 		String hashedPassword = passwordEncoder.encode(request.getPassword());
 
 		Utente nuovoUtente = new Utente(
@@ -82,12 +78,12 @@ public class UtenteService {
 		return utenteMapper.toDTO(salvato);
 	}
 
+	// Ripristina la sessione backend a partire dall id utente
 	public UtenteDTO restoreSession(Long userId, jakarta.servlet.http.HttpSession session) {
 		if (userId == null) {
 			throw new IllegalArgumentException("Utente non trovato");
 		}
 
-		// Recupero l utente dal db e ricreo i dati di sessione usati dal backend
 		Utente utente = utenteRepository.findById(userId)
 				.orElseThrow(() -> new IllegalArgumentException("Utente non trovato"));
 
@@ -97,6 +93,7 @@ public class UtenteService {
 		return utenteMapper.toDTO(utente);
 	}
 
+	// Restituisce tutti gli utenti se chi ha la sessione è admin
 	public List<UtenteDTO> findAllUsers(HttpSession session) {
 		requireAdmin(session);
 		return utenteRepository.findAll().stream()
@@ -104,6 +101,7 @@ public class UtenteService {
 				.toList();
 	}
 
+	// Elimina un utente e pulisce i dati collegati
 	@Transactional
 	public void deleteUser(Long userId, HttpSession session) {
 		requireAdmin(session);

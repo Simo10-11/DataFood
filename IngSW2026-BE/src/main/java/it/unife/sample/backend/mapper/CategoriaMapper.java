@@ -8,9 +8,9 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface CategoriaMapper {
 
-    // Entity -> DTO
+    // Converte una categoria in DTO
     CategoriaDTO toDTO(Categoria entity);
 
-    // DTO -> Entity
+    // Converte un DTO categoria in entity
     Categoria toEntity(CategoriaDTO dto);
 }

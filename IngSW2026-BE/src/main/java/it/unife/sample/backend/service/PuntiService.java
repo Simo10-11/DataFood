@@ -23,6 +23,7 @@ public class PuntiService {
      * Calcola i punti guadagnati per un ordine
      * 1 punto ogni 20€ spesi (per difetto)
      */
+    // Calcola i punti guadagnati a partire dall'importo dell'ordine
     public int calculatePuntiGuadagnati(BigDecimal importoOrdine) {
         if (importoOrdine == null || importoOrdine.signum() <= 0) {
             return 0;
@@ -35,6 +36,7 @@ public class PuntiService {
     * - Incrementa puntiDisponibili
     * - Salva nel database
      */
+    // Aggiunge i punti maturati all'utente
     @Transactional
     public void aggiungiPunti(Utente utente, int puntiGuadagnati) {
         if (puntiGuadagnati <= 0) {
@@ -50,6 +52,7 @@ public class PuntiService {
      * Converte punti disponibili in euro
      * 1 punto = 1€
      */
+    // Converte i punti in valore euro
     public double convertPuntiToEuro(int punti) {
         return punti * VALORE_PUNTO_EURO;
     }
@@ -64,6 +67,7 @@ public class PuntiService {
      * - sconto in euro (massimo il totale dell'ordine)
      * - numero di punti effettivamente utilizzati
      */
+    // Calcola quanto sconto si può applicare usando i punti disponibili
     public DiscountResult applicaScontoWithPunti(int puntiDisponibili, BigDecimal totaleOrdine) {
         if (puntiDisponibili <= 0 || totaleOrdine == null || totaleOrdine.signum() <= 0) {
             return new DiscountResult(0, 0.0, BigDecimal.ZERO);
@@ -88,6 +92,7 @@ public class PuntiService {
      * Decrementa i punti disponibili dopo l'uso
      * I punti totali NON diminuiscono mai
      */
+    // Scala i punti usati dall'account dell'utente
     @Transactional
     public void usaPunti(Utente utente, int puntiUsati) {
         if (puntiUsati <= 0) {

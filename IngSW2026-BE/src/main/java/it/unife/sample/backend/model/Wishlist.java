@@ -16,6 +16,7 @@ import lombok.Data;
 import java.util.HashSet;
 import java.util.Set;
 
+// Usiamo Lombok per generare automaticamente getter, setter e altri metodi di base e tenere il model piu pulito
 @Data
 @Entity
 @Table(name = "WISHLIST")

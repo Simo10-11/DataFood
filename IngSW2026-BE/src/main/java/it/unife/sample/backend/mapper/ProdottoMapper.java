@@ -6,20 +6,20 @@ import it.unife.sample.backend.model.Prodotto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-// MapStruct genera automaticamente l'implementazione di questa interfaccia 
+// Mappa i prodotti tra entity e DTO con categoria appiattita
 @Mapper(componentModel = "spring")
 public interface ProdottoMapper {
 
-    // Mappa i dati annidati della categoria in campi piatti del DTO.
+    // Porta i dati della categoria dentro il DTO prodotto
     @Mapping(target = "idCategoria", source = "categoria.id")
     @Mapping(target = "nomeCategoria", source = "categoria.nome")
     ProdottoDTO toDTO(Prodotto entity);
 
-    // Ricostruisce l'associazione categoria partendo solo da idCategoria.
+    // Ricostruisce il collegamento alla categoria a partire dall id
     @Mapping(target = "categoria", source = "idCategoria")
     Prodotto toEntity(ProdottoDTO dto);
 
-    // Metodo di supporto usato da MapStruct per convertire Integer -> Categoria.
+    // Supporto MapStruct per convertire un id categoria in entity
     default Categoria map(Integer idCategoria) {
         if (idCategoria == null) {
             return null;

@@ -24,11 +24,13 @@ public class CartController {
         this.cartService = cartService;
     }
 
+    // Recupera il carrello corrente dell'utente in sessione
     @GetMapping
     public ResponseEntity<CartDTO> getCart(HttpSession session) {
         return ResponseEntity.ok(cartService.getCart(session));
     }
 
+    // Aggiunge un prodotto al carrello dell'utente
     @PostMapping("/add/{productId}")
     public ResponseEntity<CartDTO> addToCart(@PathVariable Long productId, HttpSession session) {
         try {
@@ -41,6 +43,7 @@ public class CartController {
         }
     }
 
+    // Rimuove un prodotto dal carrello
     @PostMapping("/remove/{productId}")
     public ResponseEntity<CartDTO> removeFromCart(@PathVariable Long productId, HttpSession session) {
         try {
@@ -50,6 +53,7 @@ public class CartController {
         }
     }
 
+    // Aggiorna la quantita di un prodotto nel carrello
     @PostMapping("/update")
     public ResponseEntity<CartDTO> updateCart(
             @RequestBody CartUpdateRequestDTO request,

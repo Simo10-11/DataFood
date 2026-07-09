@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+// Usiamo Lombok per generare automaticamente getter, setter e costruttori e tenere il model piu pulito
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -58,6 +58,7 @@ public class OrderService {
         this.puntiService = puntiService;
     }
 
+    // Conclude il checkout standard e assegna i punti guadagnati
     @Transactional
     public OrderDTO checkout(HttpSession session) {
         Cart cart = getCartFromSession(session);
@@ -126,6 +127,7 @@ public class OrderService {
      * Checkout con applicazione sconto punti
      * Se usePunti è true, applica il massimo sconto possibile usando i punti disponibili
      */
+    // Conclude il checkout applicando eventualmente i punti disponibili
     @Transactional
     public OrderDTO checkoutWithPoints(HttpSession session, boolean usePunti) {
         Cart cart = getCartFromSession(session);
@@ -215,6 +217,7 @@ public class OrderService {
     /**
      * Restituisce preview dello sconto se l'utente usa i suoi punti
      */
+    // Calcola l'anteprima dello sconto applicabile con i punti
     public java.util.Map<String, Object> previewDiscount(HttpSession session) {
         Cart cart = getCartFromSession(session);
 
@@ -251,6 +254,7 @@ public class OrderService {
         );
     }
 
+    // Restituisce gli ordini dell'utente autenticato
     public List<OrderDTO> getMyOrders(HttpSession session) {
         Utente utente = getLoggedUser(session);
 
@@ -259,6 +263,7 @@ public class OrderService {
                 .toList();
     }
 
+    // Restituisce tutti gli ordini con filtri, ricerca, sorting e paginazione
     public Page<OrderDTO> getAllOrders(
             HttpSession session,
             int page,
@@ -286,6 +291,7 @@ public class OrderService {
         return new PageImpl<>(content, PageRequest.of(safePage, safeSize), sortedOrders.size());
     }
 
+    // Aggiorna lo stato di un ordine per l'amministrazione
     public OrderDTO updateOrderStatus(Long orderId, OrderStatusUpdateDTO request, HttpSession session) {
         requireAdmin(session);
 

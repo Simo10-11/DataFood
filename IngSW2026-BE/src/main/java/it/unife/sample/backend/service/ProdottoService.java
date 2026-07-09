@@ -38,27 +38,28 @@ public class ProdottoService {
         this.utenteRepository = utenteRepository;
     }
 
+    // Restituisce tutti i prodotti disponibili
     public List<ProdottoDTO> findAll() {
-        // Recupera tutti i prodotti e li converte in DTO.
         return prodottoRepository.findAll().stream()
                 .map(prodottoMapper::toDTO)
                 .toList();
     }
 
+    // Cerca i prodotti per nome in modo case insensitive
     public List<ProdottoDTO> searchByNome(String nome) {
-        // Ricerca case-insensitive per nome prodotto.
         return prodottoRepository.findByNomeContainingIgnoreCase(nome).stream()
                 .map(prodottoMapper::toDTO)
                 .toList();
     }
 
+    // Filtra i prodotti di una categoria specifica
     public List<ProdottoDTO> findByCategoriaId(Integer categoriaId) {
-        // Filtra i prodotti usando l'id della categoria.
         return prodottoRepository.findByCategoria_Id(categoriaId).stream()
                 .map(prodottoMapper::toDTO)
                 .toList();
     }
 
+    // Crea un nuovo prodotto nel catalogo
     public ProdottoDTO create(ProdottoDTO request, HttpSession session) {
         requireAdmin(session);
         validateRequest(request);
@@ -71,6 +72,7 @@ public class ProdottoService {
         return prodottoMapper.toDTO(saved);
     }
 
+    // Aggiorna un prodotto esistente
     public ProdottoDTO update(Integer id, ProdottoDTO request, HttpSession session) {
         requireAdmin(session);
         if (id == null || id <= 0) {
@@ -93,6 +95,7 @@ public class ProdottoService {
         return prodottoMapper.toDTO(saved);
     }
 
+    // Elimina un prodotto dal catalogo
     public void delete(Integer id, HttpSession session) {
         requireAdmin(session);
 

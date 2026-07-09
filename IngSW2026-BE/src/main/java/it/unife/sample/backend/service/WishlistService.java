@@ -15,7 +15,7 @@ import java.util.List;
 @Service
 public class WishlistService {
 
-    // Logica per aggiungere e rimuovere elementi dalla wishlist
+    // Gestisce la logica della wishlist e i collegamenti con utenti e prodotti
 
     private final WishlistRepository wishlistRepository;
     private final UtenteRepository utenteRepository;
@@ -31,12 +31,14 @@ public class WishlistService {
         this.prodottoRepository = prodottoRepository;
     }
 
+    // Restituisce la wishlist di un utente
     public List<WishlistDTO> getWishlistByUtente(Long utenteId) {
         return wishlistRepository.findByUtente_Id(utenteId).stream()
                 .map(WishlistMapper::toDTO)
                 .toList();
     }
 
+    // Aggiunge un prodotto alla wishlist dell'utente
     public WishlistDTO addToWishlist(WishlistDTO dto) {
         if (dto.getUtenteId() == null || dto.getProdottoId() == null) {
             throw new IllegalArgumentException("utenteId e prodottoId sono obbligatori");
@@ -59,6 +61,7 @@ public class WishlistService {
         return WishlistMapper.toDTO(saved);
     }
 
+    // Rimuove un elemento wishlist tramite id
     public void removeFromWishlist(Long id) {
         if (!wishlistRepository.existsById(id)) {
             throw new IllegalArgumentException("Elemento wishlist non trovato");
@@ -66,6 +69,7 @@ public class WishlistService {
         wishlistRepository.deleteById(id);
     }
 
+    // Rimuove un prodotto specifico dalla wishlist dell'utente
     public void removeFromWishlist(Long utenteId, Integer prodottoId) {
         if (utenteId == null || prodottoId == null) {
             throw new IllegalArgumentException("utenteId e prodottoId sono obbligatori");

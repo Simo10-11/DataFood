@@ -13,6 +13,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 
+// Usiamo Lombok per generare automaticamente getter, setter e altri metodi di base e tenere il model piu pulito
 @Data
 @Entity
 @Table(name = "PRODOTTO")

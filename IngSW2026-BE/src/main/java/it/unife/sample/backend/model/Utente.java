@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+// Usiamo Lombok per generare automaticamente getter, setter e costruttori e tenere il model piu pulito
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

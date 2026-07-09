@@ -30,6 +30,7 @@ public class OrderController {
         this.orderService = orderService;
     }
 
+    // Completa il checkout dell'ordine usando la sessione corrente
     @PostMapping("/checkout")
     public ResponseEntity<OrderDTO> checkout(
             HttpSession session,
@@ -48,6 +49,7 @@ public class OrderController {
         }
     }
 
+    // Mostra in anteprima lo sconto applicabile all'ordine
     @GetMapping("/preview-discount")
     public ResponseEntity<?> previewDiscount(HttpSession session) {
         try {
@@ -59,6 +61,7 @@ public class OrderController {
         }
     }
 
+    // Restituisce gli ordini dell'utente loggato
     @GetMapping("/my")
     public ResponseEntity<List<OrderDTO>> getMyOrders(HttpSession session) {
         try {
@@ -68,6 +71,7 @@ public class OrderController {
         }
     }
 
+    // Restituisce tutti gli ordini con filtri e paginazione
     @GetMapping
     public ResponseEntity<Page<OrderDTO>> getAllOrders(
             HttpSession session,
@@ -85,6 +89,7 @@ public class OrderController {
         }
     }
 
+    // Aggiorna lo stato di un ordine
     @PatchMapping("/{id}")
     public ResponseEntity<OrderDTO> updateOrderStatus(
             @PathVariable Long id,

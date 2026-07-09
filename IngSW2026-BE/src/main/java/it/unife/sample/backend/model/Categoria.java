@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+// Usiamo Lombok per generare automaticamente getter, setter e altri metodi di base e tenere il model piu pulito
 @Data
 @Entity
 @Table(name = "CATEGORIA")

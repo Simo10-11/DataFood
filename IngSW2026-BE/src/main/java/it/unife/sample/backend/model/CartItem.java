@@ -1,5 +1,6 @@
 package it.unife.sample.backend.model;
 
+// Rappresenta una singola riga del carrello con prodotto, prezzo e quantita
 public class CartItem {
 
     private Long productId;

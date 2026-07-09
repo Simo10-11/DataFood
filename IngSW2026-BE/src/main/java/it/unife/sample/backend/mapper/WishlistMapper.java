@@ -11,10 +11,10 @@ import java.util.Set;
 public class WishlistMapper {
 
     private WishlistMapper() {
-        // Utility class: non istanziabile.
+        // Utility class: non istanziabile
     }
 
-    // Converte tra entita wishlist e oggetti DTO semplici
+    // Converte una wishlist nel DTO esposto al frontend
 
     public static WishlistDTO toDTO(Wishlist entity) {
         WishlistDTO dto = new WishlistDTO();
@@ -27,6 +27,7 @@ public class WishlistMapper {
         return dto;
     }
 
+    // Ricostruisce una wishlist partendo da DTO, utente e prodotto
     public static Wishlist toEntity(WishlistDTO dto, Utente utente, Prodotto prodotto) {
         Wishlist entity = new Wishlist();
         entity.setId(dto.getId());

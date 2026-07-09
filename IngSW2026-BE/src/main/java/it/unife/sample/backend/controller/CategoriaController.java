@@ -26,12 +26,13 @@ public class CategoriaController {
         this.categoriaService = categoriaService;
     }
 
+    // Restituisce tutte le categorie disponibili
     @GetMapping
     public ResponseEntity<List<CategoriaDTO>> getAllCategorie() {
-        // Restituisce l'elenco completo delle categorie disponibili.
         return ResponseEntity.ok(categoriaService.findAll());
     }
 
+    // Crea una nuova categoria se l'utente ha i permessi
     @PostMapping
     public ResponseEntity<CategoriaDTO> createCategory(@RequestBody CategoriaDTO request, HttpSession session) {
         try {
@@ -43,6 +44,7 @@ public class CategoriaController {
         }
     }
 
+    // Aggiorna i dati di una categoria esistente
     @PutMapping("/{id}")
     public ResponseEntity<CategoriaDTO> updateCategory(
             @PathVariable Integer id,
@@ -61,6 +63,7 @@ public class CategoriaController {
         }
     }
 
+    // Elimina una categoria se non e collegata a prodotti
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Integer id, HttpSession session) {
         try {

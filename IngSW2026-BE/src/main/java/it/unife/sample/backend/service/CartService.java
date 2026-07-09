@@ -16,7 +16,7 @@ import java.util.Optional;
 @Service
 public class CartService {
 
-    // Servizio che gestisce la logica del carrello e l'integrazione con il repository prodotti
+    // Gestisce la logica del carrello e l'integrazione con il repository prodotti
 
     private static final String CART_SESSION_ATTRIBUTE = "cart";
     private static final String LOGGED_USER_ID_SESSION_ATTRIBUTE = "loggedUserId";
@@ -27,12 +27,14 @@ public class CartService {
         this.prodottoRepository = prodottoRepository;
     }
 
+    // Restituisce il carrello corrente e lo riallinea ai dati del database
     public CartDTO getCart(HttpSession session) {
         Cart cart = getOrCreateCart(session);
         refreshCartDataFromDatabase(cart);
         return CartMapper.toDTO(cart);
     }
 
+    // Aggiunge un prodotto al carrello della sessione
     public CartDTO addProduct(Long productId, HttpSession session) {
         Prodotto prodotto = findProductOrThrow(productId);
         Cart cart = getOrCreateCart(session);
@@ -42,6 +44,7 @@ public class CartService {
         return CartMapper.toDTO(cart);
     }
 
+    // Rimuove un prodotto dal carrello della sessione
     public CartDTO removeProduct(Long productId, HttpSession session) {
         if (productId == null || productId <= 0) {
             throw new IllegalArgumentException("productId non valido");
@@ -53,6 +56,7 @@ public class CartService {
         return CartMapper.toDTO(cart);
     }
 
+    // Aggiorna la quantita di un prodotto nel carrello
     public CartDTO updateQuantity(CartUpdateRequestDTO request, HttpSession session) {
         if (request == null || request.getProductId() == null || request.getQuantita() == null) {
             throw new IllegalArgumentException("productId e quantita sono obbligatori");
